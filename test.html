@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Video Player</title>
+    <!-- External Libraries (Tailwind & FontAwesome) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- ========================================= -->
+    <!--          CSS FILE CONTENT (style.css)     -->
+    <!-- ========================================= -->
+    <style>
+        /* --- CSS START --- */
+
+        /* Custom range slider styling */
+        input[type=range] {
+            -webkit-appearance: none;
+            background: transparent;
+        }
+
+        /* Thumb (the circle handle) */
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 16px;
+            width: 16px;
+            border-radius: 50%;
+            background: #ffffff;
+            cursor: pointer;
+            margin-top: -6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+
+        /* Track (the bar) */
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: rgba(255,255,255,0.3);
+            border-radius: 2px;
+        }
+
+        input[type=range]:focus {
+            outline: none;
+        }
+        
+        /* Overlay Animation */
+        .video-container:hover .controls-overlay {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .controls-overlay {
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        /* --- CSS END --- */
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex flex-col items-center justify-center font-sans p-4">
+
+    <!-- ========================================= -->
+    <!--          HTML FILE CONTENT (index.html)   -->
+    <!-- ========================================= -->
+
+    <div class="w-full max-w-4xl mx-auto space-y-6">
+        
+        <!-- Header -->
+        <div class="flex justify-between items-center w-full">
+            <h1 class="text-2xl font-bold tracking-tight text-blue-500">
+                <i class="fas fa-play-circle mr-2"></i>NeoPlayer
+            </h1>
+            
+            <!-- File Upload Button -->
+            <div class="relative">
+                <input type="file" id="fileInput" accept="video/*" class="hidden">
+                <label for="fileInput" class="cursor-pointer bg-gray-800 hover:bg-gray-700 text-white py-2 px-4 rounded-full text-sm transition-colors border border-gray-700 flex items-center gap-2">
+                    <i class="fas fa-folder-open"></i> Open File
+                </label>
+            </div>
+        </div>
+
+        <!-- Video Player Container -->
+        <div id="videoContainer" class="relative group w-full bg-black rounded-xl overflow-hidden shadow-2xl ring-1 ring-white/10 aspect-video flex flex-col justify-center">
+            
+            <!-- Video Element -->
+            <video id="mainVideo" class="w-full h-full object-contain" poster="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/BigBuckBunny.jpg">
+                <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+
+            <!-- Loading Spinner -->
+            <div id="loader" class="hidden absolute inset-0 items-center justify-center bg-black/50 z-10">
+                <i class="fas fa-circle-notch fa-spin text-4xl text-blue-500"></i>
+            </div>
+
+            <!-- Big Play Button Overlay (Visible when paused) -->
+            <div id="bigPlayBtn" class="absolute inset-0 flex items-center justify-center bg-black/20 cursor-pointer group-hover:bg-black/10 transition-colors">
+                <button class="bg-red-600/90 hover:bg-red-500 text-white rounded-full w-20 h-20 flex items-center justify-center transform transition-transform hover:scale-110 shadow-lg backdrop-blur-sm">
+                    <i class="fas fa-play text-3xl ml-2"></i>
+                </button>
+            </div>
+
+            <!-- Controls Bar -->
+            <div class="controls-overlay absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-4 opacity-0 md:opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col gap-2">
+                
+                <!-- Progress Bar (Red) -->
+                <div class="w-full flex items-center group/progress cursor-pointer">
+                    <input type="range" id="progressBar" min="0" max="100" value="0" class="w-full h-1 bg-gray-600 rounded-lg appearance-none cursor-pointer">
+                </div>
+
+                <div class="flex items-center justify-between mt-2">
+                    <div class="flex items-center gap-4">
+                        <!-- Play/Pause Button (Dynamic Colors) -->
+                        <button id="playBtn" class="transition-colors w-8 text-red-600 hover:text-red-500">
+                            <i class="fas fa-play text-lg"></i>
+                        </button>
+
+                        <!-- Volume Controls -->
+                        <div class="flex items-center gap-2 group/volume">
+                            <!-- Speaker Icon (Blue on hover/active) -->
+                            <button id="muteBtn" class="text-white hover:text-blue-500 transition-colors w-8 text-left">
+                                <i class="fas fa-volume-up text-lg"></i>
+                            </button>
+                            <div class="w-0 overflow-hidden group-hover/volume:w-24 transition-all duration-300 ease-out">
+                                <!-- Volume Slider (Red Accent) -->
+                                <input type="range" id="volumeBar" min="0" max="1" step="0.1" value="1" class="w-20 accent-red-600">
+                            </div>
+                        </div>
+
+                        <!-- Time Display -->
+                        <div class="text-xs text-gray-300 font-mono">
+                            <span id="currentTime">00:00</span> / <span id="duration">00:00</span>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-4">
+                        <!-- Speed Control (Gear Icon) -->
+                        <div class="relative group/speed">
+                            <!-- Gear Icon (Blue on hover) -->
+                            <button class="text-white hover:text-blue-500 transition-colors">
+                                <i class="fas fa-cog text-lg"></i>
+                            </button>
+                            <!-- Dropdown Menu -->
+                            <div class="absolute bottom-full right-0 mb-4 hidden group-hover/speed:flex flex-col bg-gray-900/95 backdrop-blur rounded-lg p-2 shadow-xl border border-gray-700 w-32">
+                                <span class="text-xs text-gray-500 uppercase px-3 py-1 mb-1 font-bold">Speed</span>
+                                <button onclick="setSpeed(0.5)" class="px-3 py-2 hover:bg-white/10 rounded text-sm text-left transition-colors">0.5x Slow</button>
+                                <button onclick="setSpeed(1.0)" class="px-3 py-2 hover:bg-white/10 rounded text-sm text-left text-blue-500 transition-colors font-bold">1.0x Normal</button>
+                                <button onclick="setSpeed(1.5)" class="px-3 py-2 hover:bg-white/10 rounded text-sm text-left transition-colors">1.5x Fast</button>
+                                <button onclick="setSpeed(2.0)" class="px-3 py-2 hover:bg-white/10 rounded text-sm text-left transition-colors">2.0x 2x</button>
+                            </div>
+                        </div>
+
+                        <!-- Fullscreen -->
+                        <button id="fullscreenBtn" class="text-white hover:text-blue-500 transition-colors">
+                            <i class="fas fa-expand text-lg"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center text-gray-500 text-sm">
+            <p>Drag and drop a video file anywhere or click "Open File" to play your own.</p>
+        </div>
+    </div>
+
+    <!-- ========================================= -->
+    <!--          JS FILE CONTENT (script.js)      -->
+    <!-- ========================================= -->
+    <script>
+        // --- JS START ---
+
+        // DOM Elements
+        const video = document.getElementById('mainVideo');
+        const container = document.getElementById('videoContainer');
+        const playBtn = document.getElementById('playBtn');
+        const bigPlayBtn = document.getElementById('bigPlayBtn');
+        const muteBtn = document.getElementById('muteBtn');
+        const volumeBar = document.getElementById('volumeBar');
+        const progressBar = document.getElementById('progressBar');
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+        const currentTimeEl = document.getElementById('currentTime');
+        const durationEl = document.getElementById('duration');
+        const fileInput = document.getElementById('fileInput');
+        const loader = document.getElementById('loader');
+
+        // --- Core Playback Logic ---
+
+        function togglePlay() {
+            if (video.paused || video.ended) {
+                video.play();
+            } else {
+                video.pause();
+            }
+        }
+
+        function updatePlayIcon() {
+            const isPaused = video.paused;
+            const icon = isPaused ? '<i class="fas fa-play text-lg"></i>' : '<i class="fas fa-pause text-lg"></i>';
+            const bigIcon = isPaused ? '<i class="fas fa-play text-3xl ml-2"></i>' : '<i class="fas fa-pause text-3xl"></i>';
+            
+            playBtn.innerHTML = icon;
+            
+            // Dynamic Color Logic: Red for Play, Blue for Pause
+            if (isPaused) {
+                // Showing Play Icon -> RED
+                playBtn.classList.remove('text-blue-500', 'hover:text-blue-400');
+                playBtn.classList.add('text-red-600', 'hover:text-red-500');
+                
+                // Big Button Logic
+                bigPlayBtn.style.display = 'flex';
+                bigPlayBtn.querySelector('button').innerHTML = bigIcon;
+                bigPlayBtn.querySelector('button').classList.remove('bg-blue-600/90', 'hover:bg-blue-500');
+                bigPlayBtn.querySelector('button').classList.add('bg-red-600/90', 'hover:bg-red-500');
+            } else {
+                // Showing Pause Icon -> BLUE
+                playBtn.classList.remove('text-red-600', 'hover:text-red-500');
+                playBtn.classList.add('text-blue-500', 'hover:text-blue-400');
+                
+                bigPlayBtn.style.display = 'none';
+            }
+        }
+
+        function updateProgress() {
+            const percent = (video.currentTime / video.duration) * 100;
+            progressBar.value = percent || 0;
+            
+            // Update time display
+            currentTimeEl.textContent = formatTime(video.currentTime);
+            if(video.duration) durationEl.textContent = formatTime(video.duration);
+            
+            // Update slider background gradient -> RED (#dc2626)
+            const val = progressBar.value;
+            progressBar.style.background = `linear-gradient(to right, #dc2626 0%, #dc2626 ${val}%, rgba(255,255,255,0.3) ${val}%, rgba(255,255,255,0.3) 100%)`;
+        }
+
+        function setProgress() {
+            const time = (progressBar.value / 100) * video.duration;
+            video.currentTime = time;
+        }
+
+        function toggleMute() {
+            video.muted = !video.muted;
+            updateVolumeIcon();
+        }
+
+        function setVolume() {
+            video.volume = volumeBar.value;
+            video.muted = false;
+            updateVolumeIcon();
+        }
+
+        function updateVolumeIcon() {
+            let iconClass = 'fa-volume-up';
+            if (video.muted || video.volume === 0) iconClass = 'fa-volume-mute';
+            else if (video.volume < 0.5) iconClass = 'fa-volume-down';
+            
+            muteBtn.innerHTML = `<i class="fas ${iconClass} text-lg"></i>`;
+            volumeBar.value = video.muted ? 0 : video.volume;
+
+            // Speaker Icon Color: Blue if muted, White if active
+            if (video.muted) {
+                muteBtn.classList.add('text-blue-500');
+                muteBtn.classList.remove('text-white');
+            } else {
+                muteBtn.classList.add('text-white');
+                muteBtn.classList.remove('text-blue-500');
+            }
+        }
+
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                if (container.requestFullscreen) container.requestFullscreen();
+            } else {
+                if (document.exitFullscreen) document.exitFullscreen();
+            }
+        }
+
+        function updateFullscreenIcon() {
+            const isFull = document.fullscreenElement;
+            fullscreenBtn.innerHTML = isFull ? '<i class="fas fa-compress text-lg"></i>' : '<i class="fas fa-expand text-lg"></i>';
+        }
+
+        function formatTime(seconds) {
+            const m = Math.floor(seconds / 60);
+            const s = Math.floor(seconds % 60);
+            return `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+        }
+
+        // Global function for speed buttons
+        window.setSpeed = function(speed) {
+            video.playbackRate = speed;
+            
+            // Reset active states in dropdown
+            const buttons = document.querySelectorAll('.group\\/speed button');
+            buttons.forEach(btn => {
+                if(btn.innerHTML.includes('Normal') || btn.innerHTML.includes('x')) {
+                     btn.classList.remove('text-blue-500', 'font-bold');
+                }
+            });
+
+            // Highlight the active one based on text content
+            const clickedBtn = Array.from(buttons).find(b => b.textContent.includes(speed + 'x'));
+            if(clickedBtn) clickedBtn.classList.add('text-blue-500', 'font-bold');
+        }
+
+        // --- File Handling ---
+
+        fileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            loadVideoFromFile(file);
+        });
+
+        function loadVideoFromFile(file) {
+            if (!file) return;
+            
+            const fileURL = URL.createObjectURL(file);
+            video.src = fileURL;
+            video.load();
+            
+            // Auto play after loading
+            video.onloadeddata = () => {
+                video.play();
+                document.querySelector('h1').innerHTML = `<i class="fas fa-film mr-2"></i>${file.name}`;
+            };
+        }
+
+        // Drag and Drop Support
+        document.body.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            document.body.style.border = "4px dashed #3b82f6";
+        });
+
+        document.body.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            document.body.style.border = "none";
+        });
+
+        document.body.addEventListener('drop', (e) => {
+            e.preventDefault();
+            document.body.style.border = "none";
+            
+            if (e.dataTransfer.files.length > 0) {
+                if(e.dataTransfer.files[0].type.startsWith('video/')) {
+                    loadVideoFromFile(e.dataTransfer.files[0]);
+                } else {
+                    alert('Please drop a valid video file.');
+                }
+            }
+        });
+
+        // --- Event Listeners ---
+
+        video.addEventListener('click', togglePlay);
+        video.addEventListener('play', updatePlayIcon);
+        video.addEventListener('pause', updatePlayIcon);
+        video.addEventListener('timeupdate', updateProgress);
+        video.addEventListener('waiting', () => loader.classList.remove('hidden'));
+        video.addEventListener('playing', () => loader.classList.add('hidden'));
+        
+        playBtn.addEventListener('click', togglePlay);
+        bigPlayBtn.addEventListener('click', togglePlay);
+        
+        muteBtn.addEventListener('click', toggleMute);
+        // Force speaker to stay blue on hover via CSS as well
+        muteBtn.addEventListener('mouseenter', () => muteBtn.classList.add('text-blue-500'));
+        muteBtn.addEventListener('mouseleave', () => {
+            if(!video.muted) muteBtn.classList.remove('text-blue-500');
+        });
+
+        volumeBar.addEventListener('input', setVolume);
+        
+        progressBar.addEventListener('input', setProgress);
+        fullscreenBtn.addEventListener('click', toggleFullscreen);
+        document.addEventListener('fullscreenchange', updateFullscreenIcon);
+
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                togglePlay();
+            } else if (e.code === 'ArrowRight') {
+                video.currentTime += 5;
+            } else if (e.code === 'ArrowLeft') {
+                video.currentTime -= 5;
+            } else if (e.code === 'KeyF') {
+                toggleFullscreen();
+            }
+        });
+
+        // Initialize state
+        updateProgress();
+        updateVolumeIcon();
+        updatePlayIcon();
+        
+        // --- JS END ---
+    </script>
+</body>
+</html>
