@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AMD Ryzen 9 9950X3D2 - Pricing & Specs</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: system-ui, -apple-system, sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 p-4 md:p-8 min-h-screen flex flex-col items-center">
+    <div class="w-full max-w-5xl space-y-8">
+        
+        <header class="text-center">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-900" id="product-title">Loading...</h1>
+            <p class="text-gray-500 mt-2" id="product-subtitle"></p>
+            <a href="https://www.amd.com/en/products/processors/desktops/ryzen/9000-series/amd-ryzen-9-9950x3d2-dual-edition.html"><img src="root/lib/assets/gtx/img/4270752-amd-ryzen-9000-series-x3d2-product-1.jpg" width="512px" style="display: inline; border-radius: 16px;"></a>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 md:col-span-1 h-fit">
+                <div class="mb-6 flex justify-center">
+                    <img id="product-image" src="" alt="Product Image" class="max-w-full h-auto max-h-48 rounded-lg object-contain hidden" onerror="this.style.display='none'">
+                </div>
+                <h2 class="text-lg font-bold mb-4 border-b border-gray-100 pb-2 text-gray-900">Hardware Specifications</h2>
+                <ul class="space-y-4 text-sm" id="specs-list">
+                    </ul>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 md:col-span-2 overflow-hidden h-fit">
+                <div class="p-6 border-b border-gray-100 bg-white">
+                    <h2 class="text-lg font-bold text-gray-900">Available Retailers</h2>
+                </div>
+                <div class="overflow-x-auto pb-16"> <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-gray-50/50 text-gray-500 text-xs uppercase tracking-wider">
+                                <th class="p-4 font-semibold w-1/2">Retailer</th>
+                                <th class="p-4 font-semibold text-right w-1/2">Price</th>
+                            </tr>
+                        </thead>
+                        <tbody id="retailers-list" class="divide-y divide-gray-100">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const rawJsonString = `{
+          "processor": {
+            "model": "AMD Ryzen 9 9950X3D2 Dual Edition",
+            "product_image_url": "/root/lib/assets/gtx/img/4270752-amd-ryzen-9000-series-x3d2-product-1.jpg",
+            "architecture": "Zen 5 (Granite Ridge)",
+            "socket": "AM5",
+            "core_count": 16,
+            "thread_count": 32,
+            "base_clock_ghz": 4.3,
+            "boost_clock_ghz": 5.6,
+            "cache": {
+              "total_cache_mb": 208,
+              "l3_cache_mb_total": 192,
+              "architecture_note": "Dual 3D V-Cache (96 MB per CCD)"
+            },
+            "tdp_w": 200,
+            "lithography": "4 nm",
+            "memory_support": "DDR5-5600 MT/s"
+          },
+          "retailers": [
+            {
+              "retailer": "Amazon Sweden",
+              "url": "https://www.amazon.se/-/en/AMD-100-100001978WOF/dp/B0GTRTJSNZ/",
+              "price_sek": 10390,
+              "price_formatted": "USD 1 113.65 (10 390 SEK)",
+              "previous_price_28042026": 10450
+            },
+            {
+              "retailer": "CDON",
+              "url": "https://cdon.se/produkt/processor-amd-ryzentm-9-9950x3d2-16-karnor-32-tradar-boostfrekvens-upp-till-560-ghz-8740e716c6dc5ff4/",
+              "price_sek": 14804,
+              "price_formatted": "USD 1 586.34 (14 804 SEK)",
+              "is_third_party_marketplace": true,
+              "previous_price_29042026": 16623,
+              "previous_price_28042026": 17362
+            },
+            {
+              "retailer": "Elgiganten",
+              "url": "https://www.elgiganten.se/product/gaming/datorkomponenter/processor-cpu/amd-ryzen-9-9950x3d2-processor/1083223",
+              "price_sek": 10390,
+              "price_formatted": "USD 1 113.65 (10 390 SEK)",
+              "previous_price_28042026": 10390
+            },
+            {
+              "retailer": "Inet",
+              "url": "https://www.inet.se/produkt/5307669/amd-ryzen-9-9950x3d2-4-3ghz-208mb",
+              "price_sek": 10399,
+              "price_formatted": "USD 1 114.62 (10 399 SEK)",
+              "previous_price_28042026": 10399
+            },
+            {
+              "retailer": "Komplett",
+              "url": "https://www.komplett.se/product/1338752/datorutrustning/datorkomponenter/processor/amd-ryzen-9-9950x3d2-dual-edition-cpu",
+              "price_sek": 10390,
+              "price_formatted": "USD 1 113.65 (10 390 SEK)",
+              "previous_price_28042026": 99999
+            },
+            {
+              "retailer": "NetOnNet",
+              "url": "https://www.netonnet.se/art/datorkomponenter/processor/amd-am5-socket/amd-ryzen-9-9950x3d2-16c32t-5-6ghz-box/1065195.19286/",
+              "price_sek": 10390,
+              "price_formatted": "USD 1 113.65 (10 390 SEK)",
+              "previous_price_28042026": 10390
+            },
+            {
+              "retailer": "Proshop",
+              "url": "https://www.proshop.se/CPU/AMD-Ryzen-9-9950X3D2-Dual-Edition-CPU-16-kaernor-43-GHz-AMD-AM5-AMD-Boxed-utan-kylare/3456874",
+              "price_sek": 10390,
+              "price_formatted": "USD 1 113.65 (10 390 SEK)",
+              "previous_price_28042026": 10390
+            },
+            {
+              "retailer": "Webhallen",
+              "url": "https://www.webhallen.com/se/product/397499-AMD-Ryzen-9-9950X3D2-Dual-Edition-16-Cores-32-Threads-5-6GHz",
+              "price_sek": 10390,
+              "price_formatted": "USD 1 113.65 (10 390 SEK)",
+              "previous_price_28042026": 10390
+            }
+          ]
+        }`;
+
+        function renderData(data) {
+            document.getElementById('product-title').textContent = data.processor.model;
+            document.getElementById('product-subtitle').textContent = data.processor.architecture;
+            
+            const imgEl = document.getElementById('product-image');
+            imgEl.src = data.processor.product_image_url;
+            imgEl.classList.remove('hidden');
+
+            const specsList = document.getElementById('specs-list');
+            const specsData = [
+                { label: 'Socket', value: data.processor.socket },
+                { label: 'Cores / Threads', value: `${data.processor.core_count}C / ${data.processor.thread_count}T` },
+                { label: 'Base Clock', value: `${data.processor.base_clock_ghz} GHz` },
+                { label: 'Boost Clock', value: `Up to ${data.processor.boost_clock_ghz} GHz` },
+                { label: 'Total Cache', value: `${data.processor.cache.total_cache_mb} MB`, subtext: data.processor.cache.architecture_note },
+                { label: 'TDP', value: `${data.processor.tdp_w} W` },
+                { label: 'Lithography', value: data.processor.lithography },
+                { label: 'Memory', value: data.processor.memory_support }
+            ];
+
+            specsData.forEach(spec => {
+                const li = document.createElement('li');
+                let innerHtml = `<span class="block text-xs font-semibold text-gray-500 uppercase tracking-wide">${spec.label}</span>`;
+                innerHtml += `<span class="block text-gray-900">${spec.value}</span>`;
+                
+                if (spec.subtext) {
+                    innerHtml += `<span class="block text-xs text-gray-400 mt-0.5">${spec.subtext}</span>`;
+                }
+                
+                li.innerHTML = innerHtml;
+                specsList.appendChild(li);
+            });
+
+            const retailersList = document.getElementById('retailers-list');
+            const sortedRetailers = data.retailers.sort((a, b) => a.price_sek - b.price_sek);
+
+            sortedRetailers.forEach(store => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-gray-50 transition-colors";
+                
+                const isPlaceholder = store.note === "Placeholder";
+                let priceHtml = store.price_formatted;
+                
+                if (isPlaceholder) {
+                    priceHtml += `<br><span class="inline-block mt-1 px-2 py-0.5 bg-red-100 text-red-700 text-[10px] uppercase font-bold rounded">Placeholder</span>`;
+                }
+
+                // Constructing the Retailer Column with potential warning
+                let retailerHtml = `
+                    <a href="${store.url}" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:text-blue-800 hover:underline font-medium">
+                        ${store.retailer}
+                    </a>`;
+
+                if (store.is_third_party_marketplace) {
+                    retailerHtml += `
+                        <div class="mt-1 flex items-center group relative cursor-help w-max">
+                            <span class="px-2 py-0.5 bg-amber-100 text-amber-800 text-[10px] uppercase font-bold rounded-full border border-amber-200">
+                                ⚠️ 3rd-Party Seller
+                            </span>
+                            <div class="opacity-0 invisible group-hover:opacity-100 group-hover:visible absolute left-0 top-full mt-2 w-56 p-2 bg-gray-900 text-white text-xs rounded shadow-lg z-10 transition-all duration-200">
+                                Be wary of 3rd-party resellers on this platform. Shipping and return policies may vary from official store stock.
+                            </div>
+                        </div>`;
+                }
+
+                tr.innerHTML = `
+                    <td class="p-4 align-middle border-t border-gray-100 relative">
+                        ${retailerHtml}
+                    </td>
+                    <td class="p-4 text-right align-middle border-t border-gray-100">
+                        <span class="${isPlaceholder ? 'text-gray-400' : 'text-gray-900 font-medium'} block">
+                            ${priceHtml}
+                        </span>
+                    </td>
+                `;
+                retailersList.appendChild(tr);
+            });
+        }
+
+        try {
+            const parsedData = JSON.parse(rawJsonString);
+            renderData(parsedData);
+        } catch (error) {
+            console.error("Failed to parse the JSON data:", error);
+            document.getElementById('product-title').textContent = "Failed to load data.";
+            document.getElementById('product-subtitle').textContent = "Please check the console for more details.";
+        }
+    </script>
+    <p class="text-center text-xs text-gray-400 pb-4">last updated: 29-04-2026</p>
+</body>
+</html>
