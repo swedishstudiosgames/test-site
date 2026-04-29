@@ -160,7 +160,7 @@
             const specsList = document.getElementById('specs-list');
             const specsData = [
                 { label: 'Socket', value: data.processor.socket },
-                { label: 'Cores / Threads', value: `${data.processor.core_count}C / USD {data.processor.thread_count}T` },
+                { label: 'Cores / Threads', value: `${data.processor.core_count}C / ${data.processor.thread_count}T` },
                 { label: 'Base Clock', value: `${data.processor.base_clock_ghz} GHz` },
                 { label: 'Boost Clock', value: `Up to ${data.processor.boost_clock_ghz} GHz` },
                 { label: 'Total Cache', value: `${data.processor.cache.total_cache_mb} MB`, subtext: data.processor.cache.architecture_note },
