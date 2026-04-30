@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AMD Ryzen 9 9950X3D2 Dashboard</title>
+    
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js for the dynamic area chart -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        body { font-family: system-ui, -apple-system, sans-serif; }
+    </style>
+</head>
+<body class="bg-[#0a0a0a] text-zinc-100 p-4 md:p-8 min-h-screen">
+    <div class="max-w-6xl mx-auto space-y-8">
+        
+        <!-- Header section -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+                <h1 class="text-3xl md:text-4xl font-bold tracking-tight bg-gradient-to-r from-orange-500 to-red-600 bg-clip-text text-transparent">
+                    AMD Price Dashboard
+                </h1>
+                <p class="text-zinc-500 flex items-center gap-2 mt-2">
+                    <i data-lucide="clock" class="w-3.5 h-3.5"></i>
+                    Last updated: <span id="last-updated-text">30/04/2026 13:13</span>
+                </p>
+            </div>
+            <button onclick="simulateUpdate()" class="px-6 py-3 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded-xl font-semibold transition-all flex items-center gap-2 group active:scale-95">
+                <i data-lucide="activity" class="w-[18px] h-[18px] text-orange-500 group-hover:animate-pulse"></i>
+                Simulate Market Update
+            </button>
+        </div>
+
+        <!-- Hero Product Card -->
+        <div class="bg-zinc-900/50 border border-zinc-800 rounded-3xl p-6 flex flex-col md:flex-row gap-8 items-center shadow-2xl">
+            <div class="w-full md:w-56 h-56 bg-black rounded-2xl overflow-hidden flex items-center justify-center border border-zinc-800 p-4 shrink-0">
+                <img id="hero-image" src="https://www.amd.com/content/dam/amd/en/images/products/processors/ryzen/4270752-amd-ryzen-9000-series-x3d2/4270752-amd-ryzen-9000-series-x3d2-product-1.jpg" alt="CPU" class="w-full h-full object-contain">
+            </div>
+            <div class="flex-1">
+                <span class="text-xs font-bold uppercase tracking-widest text-orange-500 mb-2 block" id="hero-architecture">
+                    Zen 5 (Granite Ridge)
+                </span>
+                <h2 class="text-3xl md:text-5xl font-black mb-3" id="hero-title">AMD Ryzen 9 9950X3D2 Dual Edition</h2>
+                <p class="text-zinc-300 font-medium text-lg mb-3" id="hero-tagline">
+                    The World's First Dual AMD 3D V-Cache™ Technology-Based Desktop Processor to Unlock a New Future of Computing for Developers and Creators.
+                </p>
+                <p class="text-zinc-500 text-sm md:text-base mb-6 max-w-3xl leading-relaxed border-l-2 border-orange-500 pl-4" id="hero-description">
+                    Built for demanding developers, the AMD Ryzen 9 9950X3D2 Dual Edition processor combines high-performance “Zen 5” core technology with dual 2nd Gen AMD 3D V-Cache technology across all 16 cores, delivering 208MB of total cache for expanded cache capacity and low latency. The result is exceptional responsiveness, increased throughput and flexibility to power next-generation development and creation workflows.
+                </p>
+                <div class="flex flex-wrap gap-3">
+                    <div class="px-4 py-2 bg-black rounded-lg border border-zinc-800 text-sm flex items-center gap-2 font-medium">
+                        <i data-lucide="cpu" class="w-4 h-4 text-zinc-500"></i>
+                        Socket AM5
+                    </div>
+                    <div class="px-4 py-2 bg-black rounded-lg border border-zinc-800 text-sm flex items-center gap-2 font-medium">
+                        <i data-lucide="layers" class="w-4 h-4 text-zinc-500"></i>
+                        16 Cores / 32 Threads
+                    </div>
+                    <div class="px-4 py-2 bg-black rounded-lg border border-zinc-800 text-sm flex items-center gap-2 font-medium">
+                        <i data-lucide="trending-up" class="w-4 h-4 text-green-500"></i>
+                        Lowest Market Price: <span id="hero-lowest-price">...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- EXPANDED HARDWARE SPECIFICATIONS -->
+        <div class="space-y-6">
+            <h3 class="text-2xl font-bold flex items-center gap-2 pl-2">
+                <i data-lucide="database" class="w-6 h-6 text-orange-500"></i>
+                Expanded Hardware Specifications
+            </h3>
+            
+            <div id="specs-container">
+                <!-- Javascript will inject the detailed sections here to keep the HTML clean -->
+            </div>
+        </div>
+
+        <!-- CHART & PRICING SECTION -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 pt-4">
+            <div class="lg:col-span-2 bg-zinc-900 border border-zinc-800 rounded-3xl p-6 shadow-xl flex flex-col">
+                <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
+                    <i data-lucide="trending-down" class="w-5 h-5 text-orange-500"></i>
+                    Dynamic Price History (SEK)
+                </h3>
+                
+                <div class="bg-red-500/10 border border-red-500/20 text-red-400 text-sm p-4 rounded-xl flex items-start gap-3 mb-6">
+                    <i data-lucide="info" class="w-5 h-5 shrink-0 mt-0.5"></i>
+                    <div>
+                        <strong class="block text-red-300 mb-1">Price History Anomaly Notice:</strong> 
+                        Komplett's previous price was <strong>99 999 SEK</strong> in the price history. This exceptionally high value was a temporary placeholder before the retailer adjusted it down to the official MSRP. This anomaly is visible as a massive spike in the historical chart data.
+                    </div>
+                </div>
+
+                <div class="h-[350px] w-full mt-auto relative">
+                    <canvas id="priceChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Quick Stats Panel -->
+            <div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-6 flex flex-col gap-4">
+                <h3 class="text-xl font-bold mb-2">Market Sentiment</h3>
+                <div class="p-4 rounded-2xl bg-black border border-zinc-800">
+                    <span class="text-zinc-500 text-sm">Best Current Price</span>
+                    <p class="text-2xl font-black text-white mt-1" id="stat-lowest-price">...</p>
+                </div>
+                <div class="p-4 rounded-2xl bg-black border border-zinc-800">
+                    <span class="text-zinc-500 text-sm">Target MSRP (Estimated)</span>
+                    <p class="text-2xl font-black text-zinc-400 mt-1" id="stat-target-price">...</p>
+                </div>
+                <div class="mt-auto">
+                    <p class="text-xs text-zinc-600 mb-4 italic">
+                        State simulation applies realistic pricing volatility across active retailers.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- CDON Reseller Warning -->
+        <div class="bg-amber-500/10 border border-amber-500/20 text-amber-400 text-sm p-4 rounded-xl flex items-start gap-3 mb-2">
+            <i data-lucide="info" class="w-5 h-5 shrink-0 mt-0.5"></i>
+            <div>
+                <strong class="block text-amber-300 mb-1">Consumer Advisory: Third-Party Reseller Pricing</strong>
+                The current listed price at CDON is significantly higher than the standard market range. Customers are strongly advised to exercise caution and verify the reputation of the third-party reseller on the platform, as unusually high prices can sometimes indicate price gouging or potentially fraudulent listings.
+            </div>
+        </div>
+
+        <!-- Sorted Retailer Table -->
+        <div class="bg-zinc-900 border border-zinc-800 rounded-3xl overflow-hidden">
+            <div class="p-6 border-b border-zinc-800 bg-zinc-900/50 flex justify-between items-center">
+                <h3 class="text-xl font-bold">Live Swedish Retailers</h3>
+                <span class="text-xs bg-zinc-800 text-zinc-400 px-3 py-1 rounded-full border border-zinc-700" id="active-sources-count">Loading...</span>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="text-zinc-500 text-sm uppercase tracking-wider bg-black/40">
+                            <th class="px-6 py-4 font-semibold">Retailer</th>
+                            <th class="px-6 py-4 font-semibold">Stock Status</th>
+                            <th class="px-6 py-4 font-semibold text-right">Price (USD/SEK)</th>
+                            <th class="px-6 py-4 font-semibold text-center w-24">Link</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-zinc-800" id="retailer-table-body">
+                        <!-- Table rows injected via JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <footer class="text-center text-zinc-600 text-sm pb-12 space-y-6 mt-8">
+            <p>Currency conversion fixed at 1 SEK = 0.091 USD</p>
+            
+            <div class="inline-block text-left bg-zinc-900/50 p-6 rounded-xl border border-zinc-800 max-w-2xl mx-auto">
+                <strong class="block text-zinc-400 mb-3 uppercase tracking-wider text-xs">Sources & Citations</strong>
+                <ul class="list-none space-y-2 text-xs text-zinc-500">
+                    <li class="flex items-start gap-2">
+                        <span class="text-zinc-700 font-mono mt-0.5">[1]</span>
+                        <a href="https://www.amd.com/en/products/processors/desktops/ryzen/9000-series/amd-ryzen-9-9950x3d2-dual-edition.html" target="_blank" rel="noopener noreferrer" class="hover:text-blue-400 hover:underline inline-flex items-center gap-1">
+                            AMD Official Product Page: AMD Ryzen™ 9 9950X3D2 Dual Edition <i data-lucide="external-link" class="w-2.5 h-2.5"></i>
+                        </a>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <span class="text-zinc-700 font-mono mt-0.5">[2]</span>
+                        <a href="https://shop-eu-en.amd.com/amd-ryzen-9-9950x3d2-dual-edition-processor/" target="_blank" rel="noopener noreferrer" class="hover:text-blue-400 hover:underline inline-flex items-center gap-1">
+                            AMD Official Store (EU): AMD Ryzen™ 9 9950X3D2 Processor Specifications <i data-lucide="external-link" class="w-2.5 h-2.5"></i>
+                        </a>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <span class="text-zinc-700 font-mono mt-0.5">[3]</span>
+                        <a href="https://www.techpowerup.com/cpu-specs/ryzen-9-9950x3d2-dual-edition.c4375" target="_blank" rel="noopener noreferrer" class="hover:text-blue-400 hover:underline inline-flex items-center gap-1">
+                            TechPowerUp CPU Database: AMD Ryzen 9 9950X3D2 Dual Edition Specs <i data-lucide="external-link" class="w-2.5 h-2.5"></i>
+                        </a>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <span class="text-zinc-700 font-mono mt-0.5">[4]</span>
+                        <a href="https://videocardz.com/228337/amd-ryzen-9-9950x3d2-review-roundup" target="_blank" rel="noopener noreferrer" class="hover:text-blue-400 hover:underline inline-flex items-center gap-1">
+                            VideoCardz: AMD Ryzen 9 9950X3D2 Review Roundup & Market Positioning <i data-lucide="external-link" class="w-2.5 h-2.5"></i>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Application Logic -->
+    <script>
+        const exchangeRate = 0.091;
+        let lastUpdatedTime = "30/04/2026 13:13";
+        let historyDays = ['26/04', '27/04', '28/04', '29/04'];
+        let chartInstance = null;
+        
+        let appData = {
+            processor: {
+                base_clock_ghz: 4.3, boost_clock_ghz: 5.6, tdp_w: 200, max_temp_c: 95, 
+                package_die_count: 3, smt: "Supported", expo: "Supported", curve_optimizer: "Supported",
+                ryzen_master: "Supported", chipsets: "X870E, X870, X670E, X670, B650E, B650, A620",
+                extensions: "AES, AMD-V, AVX, AVX-512, AVX2, FMA3, MMX(+), SHA, SSE, SSE2, SSE3, SSE4.1, SSE4.2, SSE4A, SSSE3, x86-64",
+                unlocked: "Yes (Precision Boost Overdrive)", os_support: "Windows 10/11 x64, RHEL, Ubuntu",
+                ram_generation: "DDR5 (ECC Supported)", max_memory: "256 GB (Dual Channel)", memory_subtype: "UDIMM",
+                usb_3_2_gen2: "4 Ports (10Gbps)", usb_2_0: "1 Port (480Mbps)", pcie: "PCIe 5.0", pcie_lanes: "28 / 24 (Total/Usable)",
+                nvme: "Boot, RAID0, RAID1, RAID10", graphics_model: "AMD Radeon™ Graphics", graphics_cores: "2",
+                graphics_frequency: "2200 MHz", dp_alt_mode: "Supported",
+                lithography_cpu: "TSMC 4 nm FinFET", lithography_io: "TSMC 6 nm FinFET",
+                cache: { l1: "1280 KB", l2: "16 MB", l3: "192 MB (Dual 3D V-Cache)", total: "208 MB" },
+                security_features: [
+                    "AMD Secure Processor", "AMD Platform Secure Boot", "Windows Secure Boot", "UEFI Secure Boot",
+                    "Windows Device Guard", "Supervisor Mode Execution Prevention (SMEP)", "Guest Mode Execution (GMET) Trap",
+                    "Virtualization-Based Security (VBS)", "Windows Secured-Core PC", "Firmware TPM", "AMD-V (SVM)",
+                    "AMD AVIC (Interrupt Virtualization)", "AMD-Vi (I/O MMU Virtualization)", "Second Level Address Translation (SLAT)",
+                    "Advanced Encryption Standard New Instructions (AES-NI)", "AMD Enhanced Virus Protection (NX bit)", "AMD Shadow Stack"
+                ]
+            },
+            retailers: [
+                { retailer: "Amazon Sweden", price_sek: 10390, url: "https://www.amazon.se/-/en/AMD-100-100001978WOF/dp/B0GTRTJSNZ/", history: [10500, 10450, 10420, 10390] },
+                { retailer: "CDON", price_sek: 14804, url: "https://cdon.se/produkt/processor-amd-ryzentm-9-9950x3d2-16-karnor-32-tradar-boostfrekvens-upp-till-560-ghz-8740e716c6dc5ff4/", history: [17362, 16623, 15500, 14804] },
+                { retailer: "Elgiganten", price_sek: 10390, url: "https://www.elgiganten.se/product/gaming/datorkomponenter/processor-cpu/amd-ryzen-9-9950x3d2-processor/1083223", history: [10390, 10390, 10390, 10390] },
+                { retailer: "Inet", price_sek: 10399, url: "https://www.inet.se/produkt/5307669/amd-ryzen-9-9950x3d2-4-3ghz-208mb", history: [10599, 10499, 10449, 10399] },
+                { retailer: "Komplett", price_sek: 10390, url: "https://www.komplett.se/product/1338752/datorutrustning/datorkomponenter/processor/amd-ryzen-9-9950x3d2-dual-edition-cpu", history: [99999, 99999, 99999, 10390] },
+                { retailer: "NetOnNet", price_sek: 10390, url: "https://www.netonnet.se/art/datorkomponenter/processor/amd-am5-socket/amd-ryzen-9-9950x3d2-16c32t-5-6ghz-box/1065195.19286/", history: [10490, 10450, 10390, 10390] },
+                { retailer: "Proshop", price_sek: 10390, url: "https://www.proshop.se/CPU/AMD-Ryzen-9-9950X3D2-Dual-Edition-CPU-16-kaernor-43-GHz-AMD-AM5-AMD-Boxed-utan-kylare/3456874", history: [10450, 10450, 10390, 10390] },
+                { retailer: "Webhallen", price_sek: 10390, url: "https://www.webhallen.com/se/product/397499-AMD-Ryzen-9-9950X3D2-Dual-Edition-16-Cores-32-Threads-5-6GHz", history: [10390, 10390, 10390, 10390] }
+            ]
+        };
+
+        const techDefinitions = {
+            "smt": "Simultaneous Multithreading (SMT) allows a single physical CPU core to execute two threads simultaneously...",
+            "lithography_io": "The manufacturing process node used for the Input/Output (I/O) die...",
+            "expo": "Extended Profiles for Overclocking (EXPO) provides one-click, built-in memory profiles optimized specifically for AMD AM5 platforms.",
+            "curve_optimizer": "An advanced firmware tool that allows users to dynamically adjust the processor's voltage/frequency curve.",
+            "ryzen_master": "AMD's official Windows-based software utility for real-time hardware monitoring, fine-tuning, and processor overclocking.",
+            "chipsets": "The motherboard architectures containing the system logic that are electrically and physically compatible with this specific processor.",
+            "extensions": "Hardware-level instruction sets embedded in the CPU (such as AVX-512) that accelerate specific workloads.",
+            "usb_3_2_gen2": "High-speed Universal Serial Bus ports wired directly into the CPU rather than the motherboard chipset, supporting 10 Gbps data transfer speeds.",
+            "usb_2_0": "Legacy USB ports routed directly to the CPU, typically used for lower bandwidth peripherals like keyboards, mice, or BIOS flashback tools.",
+            "pcie_lanes": "High-speed serial data pathways connecting the CPU to the GPU and storage. 'Total' includes lanes reserved for communicating with the chipset; 'Usable' are free for user components.",
+            "nvme": "Native CPU support for Non-Volatile Memory Express protocols, allowing NVMe solid-state drives (SSDs) to communicate directly with the processor without bottlenecks.",
+            "memory_subtype": "Unbuffered Dual Inline Memory Module (UDIMM). This is the standard, non-registered memory format used in consumer desktop computers.",
+            "graphics_model": "The integrated graphics processor (IGP) built into the CPU die, providing display output capabilities without requiring a dedicated discrete graphics card.",
+            "graphics_cores": "The number of independent graphics processing units (Compute Units) contained within the integrated Radeon graphics module.",
+            "dp_alt_mode": "Allows the processor's integrated graphics to output native DisplayPort video and audio signals through a compatible motherboard USB Type-C connector.",
+            "AMD Secure Processor": "A dedicated, isolated hardware co-processor integrated directly into the CPU die. It handles secure cryptographic key generation and trusted execution environments.",
+            "AMD Platform Secure Boot": "A hardware-based root of trust that cryptographically verifies the integrity of the system firmware before it is allowed to load.",
+            "Windows Secure Boot": "A security standard verifying that the device boots using only software that is trusted by the Original Equipment Manufacturer (OEM).",
+            "UEFI Secure Boot": "Ensures that bootloaders and operating system kernels are cryptographically signed, preventing rootkits and bootkits from hijacking the startup process.",
+            "Windows Device Guard": "Uses hardware-based virtualization features to isolate code integrity services from the main Windows kernel, making it harder for malware to tamper with the system.",
+            "Supervisor Mode Execution Prevention (SMEP)": "A CPU feature that prevents the operating system kernel from executing code that resides in less privileged user-mode memory, mitigating privilege escalation exploits.",
+            "Guest Mode Execution (GMET) Trap": "A security feature that intercepts and manages execution inside virtual machines, stopping malware that attempts to exploit hypervisor environments.",
+            "Virtualization-Based Security (VBS)": "Uses hardware virtualization features to create an isolated, highly secure memory region to host critical OS security solutions away from the main system.",
+            "Windows Secured-Core PC": "Indicates hardware compliance with Microsoft's highest security standards, combining identity protection, virtualization, and firmware-level exploit defenses.",
+            "Firmware TPM": "A Trusted Platform Module implemented via the CPU's firmware (fTPM). It eliminates the need for a physical TPM chip while providing the same cryptographic key storage functionality.",
+            "AMD-V (SVM)": "Secure Virtual Machine (AMD-V) provides hardware-level virtualization extensions, allowing the system to efficiently run multiple virtual operating systems (VMs) simultaneously.",
+            "AMD AVIC (Interrupt Virtualization)": "Advanced Virtual Interrupt Controller accelerates virtual machine performance by routing hardware interrupts directly to the VM, reducing hypervisor overhead.",
+            "AMD-Vi (I/O MMU Virtualization)": "Input/Output Memory Management Unit virtualization allows guest operating systems to directly and securely interface with physical hardware devices (like GPUs or network cards).",
+            "Second Level Address Translation (SLAT)": "Also known as Rapid Virtualization Indexing (RVI), this hardware feature reduces virtualization overhead by translating guest physical memory addresses to host physical addresses.",
+            "Advanced Encryption Standard New Instructions (AES-NI)": "Hardware acceleration embedded in the CPU designed to execute AES encryption and decryption operations significantly faster and more securely.",
+            "AMD Enhanced Virus Protection (NX bit)": "The No-Execute (NX) bit designates certain memory areas as non-executable. If malware attempts to run code in these areas (e.g., buffer overflow attacks), the CPU halts execution.",
+            "AMD Shadow Stack": "A hardware protection mechanism that maintains a secondary, hidden stack to verify return addresses, effectively mitigating Return-Oriented Programming (ROP) malware attacks."
+        };
+
+        const formatPrice = (sek) => {
+            const usdFormat = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(sek * exchangeRate);
+            const usd = usdFormat.replace('$', 'US$');
+            return `${usd} (${sek.toLocaleString('sv-SE')} SEK)`;
+        };
+
+        const getLowestPrice = () => Math.min(...appData.retailers.map(r => r.price_sek));
+
+        function generateTooltipHTML(description) {
+            if (!description) return '';
+            return `
+                <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-[280px] p-4 bg-zinc-800 text-zinc-200 text-sm font-normal normal-case tracking-normal rounded-xl shadow-2xl border border-zinc-700 invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all z-50 pointer-events-none">
+                    ${description}
+                    <div class="absolute top-full left-1/2 -translate-x-1/2 border-8 border-transparent border-t-zinc-700"></div>
+                    <div class="absolute top-full left-1/2 -translate-x-1/2 border-[7px] border-transparent border-t-zinc-800 -mt-[1px]"></div>
+                </div>
+            `;
+        }
+
+        function createSpecItem(label, value, icon, span = 1, defKey = null) {
+            const description = defKey ? techDefinitions[defKey] : null;
+            const spanClass = span > 1 ? `md:col-span-${span}` : '';
+            return `
+                <div class="p-4 rounded-2xl bg-black border border-zinc-800 flex flex-col gap-2 relative group ${spanClass}">
+                    <div class="text-zinc-500 flex items-center justify-between text-sm font-medium uppercase tracking-wider">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="${icon}" class="w-4 h-4 text-zinc-400"></i>
+                            ${label}
+                        </div>
+                        ${description ? `<div class="text-zinc-600 cursor-help hover:text-zinc-300 transition-colors"><i data-lucide="help-circle" class="w-3.5 h-3.5"></i></div>` : ''}
+                    </div>
+                    <div class="text-zinc-100 font-semibold leading-snug">${value}</div>
+                    ${generateTooltipHTML(description)}
+                </div>
+            `;
+        }
+
+        function createFeatureTag(label, defKey) {
+            const description = techDefinitions[defKey];
+            return `
+                <div class="relative group">
+                    <div class="px-3 py-2 bg-black rounded-xl border border-zinc-800 text-sm flex justify-between items-center gap-2 text-zinc-300 hover:bg-zinc-800/50 transition-colors cursor-help">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-500 shrink-0"></i>
+                            <span class="leading-tight">${label}</span>
+                        </div>
+                        ${description ? `<i data-lucide="help-circle" class="w-3.5 h-3.5 text-zinc-600 group-hover:text-zinc-400 shrink-0 transition-colors"></i>` : ''}
+                    </div>
+                    ${generateTooltipHTML(description)}
+                </div>
+            `;
+        }
+
+        function renderSpecs() {
+            const p = appData.processor;
+            const container = document.getElementById('specs-container');
+            
+            container.innerHTML = `
+                <!-- Core Architecture -->
+                <div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-6 shadow-xl">
+                    <h4 class="text-lg font-bold mb-4 text-zinc-300 border-b border-zinc-800 pb-2">Core Architecture & Thermals</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                        ${createSpecItem("Base Clock", `${p.base_clock_ghz} GHz`, "activity")}
+                        ${createSpecItem("Boost Clock", `Up to ${p.boost_clock_ghz} GHz`, "zap")}
+                        ${createSpecItem("Total Cache", p.cache.total, "database")}
+                        ${createSpecItem("L3 Cache", p.cache.l3, "layers")}
+                        ${createSpecItem("L2 Cache", p.cache.l2, "layers")}
+                        ${createSpecItem("L1 Cache", p.cache.l1, "layers")}
+                        ${createSpecItem("Default TDP", `${p.tdp_w} W`, "zap")}
+                        ${createSpecItem("Max Temp (Tjmax)", `${p.max_temp_c} °C`, "thermometer")}
+                        ${createSpecItem("CPU Lithography", p.lithography_cpu, "cpu")}
+                        ${createSpecItem("Package Die Count", p.package_die_count, "box")}
+                    </div>
+                </div>
+
+                <!-- General Specifications -->
+                <div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-6 shadow-xl">
+                    <h4 class="text-lg font-bold mb-4 text-zinc-300 border-b border-zinc-800 pb-2">General Specifications</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                        ${createSpecItem("Multithreading (SMT)", p.smt, "layers", 1, "smt")}
+                        ${createSpecItem("I/O Die Technology", p.lithography_io, "cpu", 1, "lithography_io")}
+                        ${createSpecItem("AMD EXPO Memory", p.expo, "settings", 1, "expo")}
+                        ${createSpecItem("Curve Optimizer", p.curve_optimizer, "activity", 1, "curve_optimizer")}
+                        ${createSpecItem("Ryzen Master Support", p.ryzen_master, "settings", 1, "ryzen_master")}
+                        ${createSpecItem("Overclocking", p.unlocked, "unlock")}
+                        ${createSpecItem("Supported Chipsets", p.chipsets, "layers", 2, "chipsets")}
+                        ${createSpecItem("OS Support", p.os_support, "monitor-play", 2)}
+                        ${createSpecItem("Supported Extensions", p.extensions, "terminal", 4, "extensions")}
+                    </div>
+                </div>
+
+                <!-- Connectivity -->
+                <div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-6 shadow-xl">
+                    <h4 class="text-lg font-bold mb-4 text-zinc-300 border-b border-zinc-800 pb-2">Connectivity & Memory Storage</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                        ${createSpecItem("RAM Generation", p.ram_generation, "hard-drive")}
+                        ${createSpecItem("Max Memory", p.max_memory, "hard-drive")}
+                        ${createSpecItem("Memory Subtype", p.memory_subtype, "hard-drive", 1, "memory_subtype")}
+                        ${createSpecItem("NVMe Support", p.nvme, "database", 1, "nvme")}
+                        ${createSpecItem("PCI Express", p.pcie, "activity")}
+                        ${createSpecItem("Native PCIe Lanes", p.pcie_lanes, "network", 1, "pcie_lanes")}
+                        ${createSpecItem("USB 3.2 Gen 2", p.usb_3_2_gen2, "usb", 1, "usb_3_2_gen2")}
+                        ${createSpecItem("USB 2.0", p.usb_2_0, "usb", 1, "usb_2_0")}
+                    </div>
+                </div>
+
+                <!-- Graphics -->
+                <div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-6 shadow-xl">
+                    <h4 class="text-lg font-bold mb-4 text-zinc-300 border-b border-zinc-800 pb-2">Graphics Capabilities</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                        ${createSpecItem("Graphics Model", p.graphics_model, "monitor", 1, "graphics_model")}
+                        ${createSpecItem("Graphics Cores", p.graphics_cores, "cpu", 1, "graphics_cores")}
+                        ${createSpecItem("Graphics Frequency", p.graphics_frequency, "activity", 1)}
+                        ${createSpecItem("Type-C DP Alt Mode", p.dp_alt_mode, "monitor-play", 1, "dp_alt_mode")}
+                    </div>
+                </div>
+
+                <!-- Security -->
+                <div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-6 shadow-xl">
+                    <h4 class="text-lg font-bold mb-4 text-zinc-300 border-b border-zinc-800 pb-2 flex items-center gap-2">
+                        <i data-lucide="shield-check" class="w-5 h-5 text-emerald-500"></i>
+                        Security & Virtualization Features
+                    </h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                        ${p.security_features.map(f => createFeatureTag(f, f)).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderDynamicData() {
+            document.getElementById('last-updated-text').textContent = lastUpdatedTime;
+            document.getElementById('hero-lowest-price').textContent = formatPrice(getLowestPrice());
+            document.getElementById('stat-lowest-price').textContent = formatPrice(getLowestPrice());
+            document.getElementById('stat-target-price').textContent = formatPrice(10390);
+            
+            // Render Table
+            const tbody = document.getElementById('retailer-table-body');
+            const sorted = [...appData.retailers].sort((a, b) => a.price_sek - b.price_sek);
+            document.getElementById('active-sources-count').textContent = `${sorted.length} Active Sources`;
+            
+            tbody.innerHTML = sorted.map(r => `
+                <tr class="hover:bg-zinc-800/30 transition-colors group">
+                    <td class="px-6 py-5 font-bold text-lg flex items-center gap-3">
+                        ${r.retailer}
+                    </td>
+                    <td class="px-6 py-5">
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${r.price_sek > 11000 ? 'bg-amber-500/10 text-amber-500 border-amber-500/20' : 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'}">
+                            <div class="w-1.5 h-1.5 rounded-full ${r.price_sek > 11000 ? 'bg-amber-500' : 'bg-emerald-500'}"></div>
+                            ${r.price_sek > 11000 ? 'ELEVATED PRICE' : 'NORMAL RANGE'}
+                        </span>
+                    </td>
+                    <td class="px-6 py-5 font-mono font-medium text-zinc-300 text-right">
+                        ${formatPrice(r.price_sek)}
+                    </td>
+                    <td class="px-6 py-5 text-center">
+                        <a href="${r.url}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center text-zinc-500 hover:text-white transition-colors bg-zinc-800 w-10 h-10 rounded-xl group-hover:bg-orange-600 group-hover:shadow-lg group-hover:shadow-orange-500/20">
+                            <i data-lucide="external-link" class="w-[18px] h-[18px]"></i>
+                        </a>
+                    </td>
+                </tr>
+            `).join('');
+
+            // Re-initialize any newly rendered icons
+            lucide.createIcons();
+            
+            updateChart();
+        }
+
+        function initChart() {
+            const ctx = document.getElementById('priceChart').getContext('2d');
+            
+            const gradientColors = {
+                orange: ctx.createLinearGradient(0, 0, 0, 350),
+                blue: ctx.createLinearGradient(0, 0, 0, 350),
+                green: ctx.createLinearGradient(0, 0, 0, 350)
+            };
+            gradientColors.orange.addColorStop(0, 'rgba(249, 115, 22, 0.3)');
+            gradientColors.orange.addColorStop(1, 'rgba(249, 115, 22, 0)');
+            
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: getChartData(gradientColors.orange),
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#18181b',
+                            borderColor: '#3f3f46',
+                            borderWidth: 1,
+                            titleFont: { size: 13, family: 'system-ui' },
+                            bodyFont: { size: 12, family: 'system-ui' },
+                            padding: 12,
+                            boxPadding: 4,
+                            usePointStyle: true
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false, drawBorder: false },
+                            ticks: { color: '#52525b', font: { family: 'system-ui', size: 12 } }
+                        },
+                        y: {
+                            grid: { color: '#27272a', borderDash: [3, 3], drawBorder: false },
+                            ticks: { 
+                                color: '#52525b', font: { family: 'system-ui', size: 12 },
+                                callback: function(value) { return value + ' kr'; }
+                            }
+                        }
+                    },
+                    elements: {
+                        point: { radius: 0, hoverRadius: 4 }
+                    }
+                }
+            });
+        }
+
+        function getChartData(primaryFill) {
+            const datasets = appData.retailers.map((r, i) => {
+                let color = i === 0 ? '#f97316' : (i === 1 ? '#3b82f6' : '#10b981');
+                if (r.retailer === "Komplett") color = '#ef4444';
+                
+                return {
+                    label: r.retailer,
+                    data: r.history,
+                    borderColor: color,
+                    borderWidth: r.retailer === "Komplett" ? 3 : 2,
+                    backgroundColor: i === 0 ? primaryFill : 'transparent',
+                    fill: i === 0,
+                    tension: 0.3
+                };
+            });
+            return { labels: historyDays, datasets: datasets };
+        }
+
+        function updateChart() {
+            if (!chartInstance) return;
+            const ctx = document.getElementById('priceChart').getContext('2d');
+            const primaryFill = ctx.createLinearGradient(0, 0, 0, 350);
+            primaryFill.addColorStop(0, 'rgba(249, 115, 22, 0.3)');
+            primaryFill.addColorStop(1, 'rgba(249, 115, 22, 0)');
+            
+            const newData = getChartData(primaryFill);
+            chartInstance.data = newData;
+            chartInstance.update();
+        }
+
+        function simulateUpdate() {
+            const now = new Date();
+            const dayStr = `${now.getDate().toString().padStart(2, '0')}/${(now.getMonth() + 1).toString().padStart(2, '0')}`;
+            const timeStr = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false });
+            
+            if (historyDays[historyDays.length - 1] === dayStr || historyDays[historyDays.length - 1].includes(':')) {
+                historyDays = [...historyDays.slice(1), timeStr];
+            } else {
+                historyDays = [...historyDays.slice(1), dayStr];
+            }
+            
+            lastUpdatedTime = `${now.toLocaleDateString('en-GB')} ${timeStr}`;
+
+            appData.retailers.forEach(r => {
+                const change = Math.floor(Math.random() * 300) - 200;
+                const newPrice = Math.max(9900, r.price_sek + change);
+                r.price_sek = newPrice;
+                r.history = [...r.history.slice(1), newPrice];
+            });
+
+            renderDynamicData();
+        }
+
+        // Boot
+        document.addEventListener('DOMContentLoaded', () => {
+            renderSpecs();
+            renderDynamicData();
+            initChart();
+            lucide.createIcons();
+        });
+    </script>
+</body>
+</html>
