@@ -32,16 +32,12 @@
                     Last updated: <span id="last-updated-text">30/04/2026 13:13</span>
                 </p>
             </div>
-            <!-- <button onclick="simulateUpdate()" class="px-6 py-3 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded-xl font-semibold transition-all flex items-center gap-2 group active:scale-95">
-                <i data-lucide="activity" class="w-[18px] h-[18px] text-orange-500 group-hover:animate-pulse"></i>
-                Simulate Market Update
-            </button> -->
         </div>
 
         <!-- Hero Product Card -->
         <div class="bg-zinc-900/50 border border-zinc-800 rounded-3xl p-6 flex flex-col md:flex-row gap-8 items-center shadow-2xl">
             <div class="w-full md:w-56 h-56 bg-black rounded-2xl overflow-hidden flex items-center justify-center border border-zinc-800 p-4 shrink-0">
-                <img id="hero-image" src="https://www.amd.com/content/dam/amd/en/images/products/processors/ryzen/4270752-amd-ryzen-9000-series-x3d2/4270752-amd-ryzen-9000-series-x3d2-product-1.jpg" alt="CPU" class="w-full h-full object-contain">
+                <img id="hero-image" src="https://www.amd.com/content/dam/amd/en/images/products/processors/ryzen/4270752-amd-ryzen-9000-series-x3d2/4270752-amd-ryzen-9000-series-x3d2-product-1.jpg" alt="CPU" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%2352525b\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'><rect x=\'4\' y=\'4\' width=\'16\' height=\'16\' rx=\'2\' ry=\'2\'></rect><rect x=\'9\' y=\'9\' width=\'6\' height=\'6\'></rect><line x1=\'9\' y1=\'1\' x2=\'9\' y2=\'4\'></line><line x1=\'15\' y1=\'1\' x2=\'15\' y2=\'4\'></line><line x1=\'9\' y1=\'20\' x2=\'9\' y2=\'23\'></line><line x1=\'15\' y1=\'20\' x2=\'15\' y2=\'23\'></line><line x1=\'20\' y1=\'9\' x2=\'23\' y2=\'9\'></line><line x1=\'20\' y1=\'14\' x2=\'23\' y2=\'14\'></line><line x1=\'1\' y1=\'9\' x2=\'4\' y2=\'9\'></line><line x1=\'1\' y1=\'14\' x2=\'4\' y2=\'14\'></line></svg>'" class="w-full h-full object-contain">
             </div>
             <div class="flex-1">
                 <span class="text-xs font-bold uppercase tracking-widest text-orange-500 mb-2 block" id="hero-architecture">
@@ -144,7 +140,7 @@
                         <tr class="text-zinc-500 text-sm uppercase tracking-wider bg-black/40">
                             <th class="px-6 py-4 font-semibold">Retailer</th>
                             <th class="px-6 py-4 font-semibold">Stock Status</th>
-                            <th class="px-6 py-4 font-semibold text-right">Price (USD/SEK)</th>
+                            <th class="px-6 py-4 font-semibold text-right">Pricing & Shipping</th>
                             <th class="px-6 py-4 font-semibold text-center w-24">Link</th>
                         </tr>
                     </thead>
@@ -193,10 +189,22 @@
     <!-- Application Logic -->
     <script>
         const exchangeRate = 0.11;
-        let lastUpdatedTime = "30/04/2026 13:13";
-        let historyDays = ['26/04', '27/04', '28/04', '29/04'];
+        let lastUpdatedTime = "01/05/2026 12:05";
+        let historyDays = ['26/04', '27/04', '28/04', '29/04', '01/05'];
         let chartInstance = null;
         
+        // Mapping of unique brand colors for each active retailer per user request
+        const brandColors = {
+            "Amazon Sweden": "#9b8767", // Dark Beige
+            "CDON": "#065f46",          // Dark Green
+            "Elgiganten": "#10b981",    // Emerald Green (kept original default)
+            "Inet": "#ef4444",          // Red
+            "Komplett": "#d4af37",      // Gold
+            "NetOnNet": "#7f1d1d",      // Dark Red
+            "Proshop": "#ef4444",       // Red
+            "Webhallen": "#4169e1"      // Royal Blue
+        };
+
         let appData = {
             processor: {
                 base_clock_ghz: 4.3, boost_clock_ghz: 5.6, tdp_w: 200, max_temp_c: 95, 
@@ -218,17 +226,21 @@
                     "Advanced Encryption Standard New Instructions (AES-NI)", "AMD Enhanced Virus Protection (NX bit)", "AMD Shadow Stack"
                 ]
             },
+            // Adjusted shipping costs and delivery times per specifications
             retailers: [
-                { retailer: "Amazon Sweden", price_sek: 10390, url: "https://www.amazon.se/-/en/AMD-100-100001978WOF/dp/B0GTRTJSNZ/", history: [10500, 10450, 10420, 10390] },
-                { retailer: "CDON", price_sek: 14804, url: "https://cdon.se/produkt/processor-amd-ryzentm-9-9950x3d2-16-karnor-32-tradar-boostfrekvens-upp-till-560-ghz-8740e716c6dc5ff4/", history: [17362, 16623, 15500, 14804] },
-                { retailer: "Elgiganten", price_sek: 10390, url: "https://www.elgiganten.se/product/gaming/datorkomponenter/processor-cpu/amd-ryzen-9-9950x3d2-processor/1083223", history: [10390, 10390, 10390, 10390] },
-                { retailer: "Inet", price_sek: 10399, url: "https://www.inet.se/produkt/5307669/amd-ryzen-9-9950x3d2-4-3ghz-208mb", history: [10599, 10499, 10449, 10399] },
-                { retailer: "Komplett", price_sek: 10390, url: "https://www.komplett.se/product/1338752/datorutrustning/datorkomponenter/processor/amd-ryzen-9-9950x3d2-dual-edition-cpu", history: [99999, 99999, 99999, 10390] },
-                { retailer: "NetOnNet", price_sek: 10390, url: "https://www.netonnet.se/art/datorkomponenter/processor/amd-am5-socket/amd-ryzen-9-9950x3d2-16c32t-5-6ghz-box/1065195.19286/", history: [10490, 10450, 10390, 10390] },
-                { retailer: "Proshop", price_sek: 10390, url: "https://www.proshop.se/CPU/AMD-Ryzen-9-9950X3D2-Dual-Edition-CPU-16-kaernor-43-GHz-AMD-AM5-AMD-Boxed-utan-kylare/3456874", history: [10450, 10450, 10390, 10390] },
-                { retailer: "Webhallen", price_sek: 10390, url: "https://www.webhallen.com/se/product/397499-AMD-Ryzen-9-9950X3D2-Dual-Edition-16-Cores-32-Threads-5-6GHz", history: [10390, 10390, 10390, 10390] }
+                { retailer: "Amazon Sweden", price_sek: 10388, url: "https://www.amazon.se/-/en/AMD-100-100001978WOF/dp/B0GTRTJSNZ/", history: [10500, 10450, 10420, 10390, 10388], shipping_cost_sek: 0, delivery_time: "1-2 days" },
+                { retailer: "CDON", price_sek: 14804, url: "https://cdon.se/produkt/processor-amd-ryzentm-9-9950x3d2-16-karnor-32-tradar-boostfrekvens-upp-till-560-ghz-8740e716c6dc5ff4/", history: [17362, 16623, 15500, 14804, 14804], shipping_cost_sek: 49, delivery_time: "2-5 days" },
+                { retailer: "Elgiganten", price_sek: 10390, url: "https://www.elgiganten.se/product/gaming/datorkomponenter/processor-cpu/amd-ryzen-9-9950x3d2-processor/1083223", history: [10390, 10390, 10390, 10390, 10390], shipping_cost_sek: 49, delivery_time: "1-3 days" },
+                { retailer: "Inet", price_sek: 10399, url: "https://www.inet.se/produkt/5307669/amd-ryzen-9-9950x3d2-4-3ghz-208mb", history: [10599, 10499, 10449, 10399, 10399], shipping_cost_sek: 0, delivery_time: "1-2 days" },
+                { retailer: "Komplett", price_sek: 10390, url: "https://www.komplett.se/product/1338752/datorutrustning/datorkomponenter/processor/amd-ryzen-9-9950x3d2-dual-edition-cpu", history: [99999, 99999, 99999, 10390, 10390], shipping_cost_sek: 0, delivery_time: "1-3 days" },
+                { retailer: "NetOnNet", price_sek: 10390, url: "https://www.netonnet.se/art/datorkomponenter/processor/amd-am5-socket/amd-ryzen-9-9950x3d2-16c32t-5-6ghz-box/1065195.19286/", history: [10490, 10450, 10390, 10390, 10390], shipping_cost_sek: 29, delivery_time: "3-4 days" },
+                { retailer: "Proshop", price_sek: 10390, url: "https://www.proshop.se/CPU/AMD-Ryzen-9-9950X3D2-Dual-Edition-CPU-16-kaernor-43-GHz-AMD-AM5-AMD-Boxed-utan-kylare/3456874", history: [10450, 10450, 10390, 10390, 10390], shipping_cost_sek: 0, delivery_time: "1-2 days" },
+                { retailer: "Webhallen", price_sek: 10390, url: "https://www.webhallen.com/se/product/397499-AMD-Ryzen-9-9950X3D2-Dual-Edition-16-Cores-32-Threads-5-6GHz", history: [10390, 10390, 10390, 10390, 10390], shipping_cost_sek: 0, delivery_time: "5-7 days" }
             ]
         };
+
+        // Sort retailers alphabetically
+        appData.retailers.sort((a, b) => a.retailer.localeCompare(b.retailer));
 
         const techDefinitions = {
             "smt": "Simultaneous Multithreading (SMT) allows a single physical CPU core to execute two threads simultaneously...",
@@ -323,7 +335,6 @@
             const container = document.getElementById('specs-container');
             
             container.innerHTML = `
-                <!-- Core Architecture -->
                 <div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-6 shadow-xl">
                     <h4 class="text-lg font-bold mb-4 text-zinc-300 border-b border-zinc-800 pb-2">Core Architecture & Thermals</h4>
                     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -340,7 +351,6 @@
                     </div>
                 </div>
 
-                <!-- General Specifications -->
                 <div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-6 shadow-xl">
                     <h4 class="text-lg font-bold mb-4 text-zinc-300 border-b border-zinc-800 pb-2">General Specifications</h4>
                     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -356,7 +366,6 @@
                     </div>
                 </div>
 
-                <!-- Connectivity -->
                 <div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-6 shadow-xl">
                     <h4 class="text-lg font-bold mb-4 text-zinc-300 border-b border-zinc-800 pb-2">Connectivity & Memory Storage</h4>
                     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -371,7 +380,6 @@
                     </div>
                 </div>
 
-                <!-- Graphics -->
                 <div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-6 shadow-xl">
                     <h4 class="text-lg font-bold mb-4 text-zinc-300 border-b border-zinc-800 pb-2">Graphics Capabilities</h4>
                     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
@@ -382,7 +390,6 @@
                     </div>
                 </div>
 
-                <!-- Security -->
                 <div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-6 shadow-xl">
                     <h4 class="text-lg font-bold mb-4 text-zinc-300 border-b border-zinc-800 pb-2 flex items-center gap-2">
                         <i data-lucide="shield-check" class="w-5 h-5 text-emerald-500"></i>
@@ -401,24 +408,39 @@
             document.getElementById('stat-lowest-price').textContent = formatPrice(getLowestPrice());
             document.getElementById('stat-target-price').textContent = formatPrice(10390);
             
-            // Render Table
             const tbody = document.getElementById('retailer-table-body');
-            const sorted = [...appData.retailers].sort((a, b) => a.price_sek - b.price_sek);
-            document.getElementById('active-sources-count').textContent = `${sorted.length} Active Sources`;
+            const retailersList = appData.retailers; 
+            document.getElementById('active-sources-count').textContent = `${retailersList.length} Active Sources`;
             
-            tbody.innerHTML = sorted.map(r => `
+            tbody.innerHTML = retailersList.map(r => {
+                const shippingHtml = r.shipping_cost_sek === 0 
+                    ? `<span class="text-emerald-500 font-semibold tracking-wide">Free Shipping</span>` 
+                    : `<span class="text-zinc-400">+${formatPrice(r.shipping_cost_sek)} shipping</span>`;
+
+                return `
                 <tr class="hover:bg-zinc-800/30 transition-colors group">
                     <td class="px-6 py-5 font-bold text-lg flex items-center gap-3">
+                        <div class="w-2.5 h-2.5 rounded-full shrink-0" style="background-color: ${brandColors[r.retailer] || '#ffffff'}; box-shadow: 0 0 8px ${brandColors[r.retailer] || '#ffffff'}80"></div>
                         ${r.retailer}
                     </td>
                     <td class="px-6 py-5">
                         <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${r.price_sek > 11000 ? 'bg-amber-500/10 text-amber-500 border-amber-500/20' : 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'}">
-                            <div class="w-1.5 h-1.5 rounded-full ${r.price_sek > 11000 ? 'bg-amber-500' : 'bg-emerald-500'}"></div>
+                            <div class="w-1.5 h-1.5 rounded-full shrink-0 ${r.price_sek > 11000 ? 'bg-amber-500' : 'bg-emerald-500'}"></div>
                             ${r.price_sek > 11000 ? 'ELEVATED PRICE' : 'NORMAL RANGE'}
                         </span>
                     </td>
-                    <td class="px-6 py-5 font-mono font-medium text-zinc-300 text-right">
-                        ${formatPrice(r.price_sek)}
+                    <td class="px-6 py-5 text-right font-mono">
+                        <div class="text-zinc-200 font-medium text-[15px] mb-1">
+                            ${formatPrice(r.price_sek)}
+                        </div>
+                        <div class="text-xs font-sans flex items-center justify-end gap-2 text-zinc-500">
+                            ${shippingHtml}
+                            <span class="text-zinc-700">•</span>
+                            <div class="flex items-center gap-1">
+                                <i data-lucide="truck" class="w-3.5 h-3.5 shrink-0"></i>
+                                ${r.delivery_time}
+                            </div>
+                        </div>
                     </td>
                     <td class="px-6 py-5 text-center">
                         <a href="${r.url}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center text-zinc-500 hover:text-white transition-colors bg-zinc-800 w-10 h-10 rounded-xl group-hover:bg-orange-600 group-hover:shadow-lg group-hover:shadow-orange-500/20">
@@ -426,34 +448,131 @@
                         </a>
                     </td>
                 </tr>
-            `).join('');
+            `}).join('');
 
-            // Re-initialize any newly rendered icons
             lucide.createIcons();
-            
             updateChart();
+        }
+
+        // --- Custom ChartJS Plugin: Draws the labels directly on the canvas to handle the "Today's Price Tags" requirement
+        const lastPointLabelPlugin = {
+            id: 'lastPointLabelPlugin',
+            afterDatasetsDraw(chart, args, options) {
+                const { ctx } = chart;
+                const tags = [];
+                
+                // 1. Gather all the latest points for each visible dataset
+                chart.data.datasets.forEach((dataset, i) => {
+                    const meta = chart.getDatasetMeta(i);
+                    if (!meta.hidden && meta.data.length > 0) {
+                        const lastPoint = meta.data[meta.data.length - 1];
+                        const value = dataset.data[dataset.data.length - 1];
+                        tags.push({
+                            datasetIndex: i,
+                            value: value,
+                            x: lastPoint.x,
+                            y: lastPoint.y,
+                            targetY: lastPoint.y, // Target Y is mutable for anti-collision
+                            color: dataset.borderColor,
+                            text: `${dataset.label}: ${value.toLocaleString('sv-SE')} kr`
+                        });
+                    }
+                });
+
+                // 2. Iterative Relaxation (Anti-Collision Algorithm)
+                const LABEL_HEIGHT = 28;
+                tags.sort((a, b) => a.y - b.y); 
+                
+                for (let j = 0; j < 15; j++) {
+                    for (let i = 0; i < tags.length - 1; i++) {
+                        const diff = tags[i+1].targetY - tags[i].targetY;
+                        if (diff < LABEL_HEIGHT) {
+                            const overlap = LABEL_HEIGHT - diff;
+                            tags[i].targetY -= overlap / 2;
+                            tags[i+1].targetY += overlap / 2;
+                        }
+                    }
+                }
+                
+                // 3. Draw the resulting Tags and connector lines
+                tags.forEach(tag => {
+                    ctx.save();
+                    ctx.font = '600 11px system-ui, -apple-system, sans-serif';
+                    const textWidth = ctx.measureText(tag.text).width;
+                    
+                    if (Math.abs(tag.targetY - tag.y) > 0.5) {
+                        ctx.beginPath();
+                        ctx.strokeStyle = tag.color;
+                        ctx.setLineDash([2, 2]);
+                        ctx.lineWidth = 1;
+                        ctx.moveTo(tag.x + 4, tag.y);
+                        ctx.lineTo(tag.x + 12, tag.targetY);
+                        ctx.stroke();
+                    }
+                    
+                    const boxX = tag.x + 12;
+                    const boxY = tag.targetY - 12;
+                    
+                    ctx.fillStyle = tag.color;
+                    ctx.beginPath();
+                    ctx.roundRect(boxX, boxY, textWidth + 16, 24, 6);
+                    ctx.fill();
+                    
+                    const hex = tag.color.replace('#', '');
+                    const r = parseInt(hex.substr(0, 2), 16);
+                    const g = parseInt(hex.substr(2, 2), 16);
+                    const b = parseInt(hex.substr(4, 2), 16);
+                    const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+                    ctx.fillStyle = (yiq >= 128) ? '#000000' : '#ffffff';
+                    
+                    ctx.textAlign = 'left';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(tag.text, boxX + 8, tag.targetY);
+                    
+                    ctx.restore();
+                });
+            }
+        };
+
+        function getChartData() {
+            const datasets = appData.retailers.map((r) => {
+                const brandColor = brandColors[r.retailer] || '#ffffff';
+                return {
+                    label: r.retailer,
+                    data: r.history,
+                    borderColor: brandColor,
+                    borderWidth: 2,
+                    backgroundColor: brandColor,
+                    
+                    pointBackgroundColor: '#18181b',
+                    pointBorderColor: brandColor,
+                    pointBorderWidth: 2,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                    
+                    fill: false, 
+                    tension: 0.3
+                };
+            });
+            return { labels: historyDays, datasets: datasets };
         }
 
         function initChart() {
             const ctx = document.getElementById('priceChart').getContext('2d');
             
-            const gradientColors = {
-                orange: ctx.createLinearGradient(0, 0, 0, 350),
-                blue: ctx.createLinearGradient(0, 0, 0, 350),
-                green: ctx.createLinearGradient(0, 0, 0, 350)
-            };
-            gradientColors.orange.addColorStop(0, 'rgba(249, 115, 22, 0.3)');
-            gradientColors.orange.addColorStop(1, 'rgba(249, 115, 22, 0)');
-            
             chartInstance = new Chart(ctx, {
                 type: 'line',
-                data: getChartData(gradientColors.orange),
+                data: getChartData(),
+                plugins: [lastPointLabelPlugin],
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     interaction: {
                         mode: 'index',
                         intersect: false,
+                    },
+                    layout: {
+                        padding: { top: 30, bottom: 30, right: 190, left: 10 } 
                     },
                     plugins: {
                         legend: { display: false },
@@ -480,65 +599,15 @@
                                 callback: function(value) { return value + ' kr'; }
                             }
                         }
-                    },
-                    elements: {
-                        point: { radius: 0, hoverRadius: 4 }
                     }
                 }
             });
         }
 
-        function getChartData(primaryFill) {
-            const datasets = appData.retailers.map((r, i) => {
-                let color = i === 0 ? '#f97316' : (i === 1 ? '#3b82f6' : '#10b981');
-                if (r.retailer === "Komplett") color = '#ef4444';
-                
-                return {
-                    label: r.retailer,
-                    data: r.history,
-                    borderColor: color,
-                    borderWidth: r.retailer === "Komplett" ? 3 : 2,
-                    backgroundColor: i === 0 ? primaryFill : 'transparent',
-                    fill: i === 0,
-                    tension: 0.3
-                };
-            });
-            return { labels: historyDays, datasets: datasets };
-        }
-
         function updateChart() {
             if (!chartInstance) return;
-            const ctx = document.getElementById('priceChart').getContext('2d');
-            const primaryFill = ctx.createLinearGradient(0, 0, 0, 350);
-            primaryFill.addColorStop(0, 'rgba(249, 115, 22, 0.3)');
-            primaryFill.addColorStop(1, 'rgba(249, 115, 22, 0)');
-            
-            const newData = getChartData(primaryFill);
-            chartInstance.data = newData;
+            chartInstance.data = getChartData();
             chartInstance.update();
-        }
-
-        function simulateUpdate() {
-            const now = new Date();
-            const dayStr = `${now.getDate().toString().padStart(2, '0')}/${(now.getMonth() + 1).toString().padStart(2, '0')}`;
-            const timeStr = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false });
-            
-            if (historyDays[historyDays.length - 1] === dayStr || historyDays[historyDays.length - 1].includes(':')) {
-                historyDays = [...historyDays.slice(1), timeStr];
-            } else {
-                historyDays = [...historyDays.slice(1), dayStr];
-            }
-            
-            lastUpdatedTime = `${now.toLocaleDateString('en-GB')} ${timeStr}`;
-
-            appData.retailers.forEach(r => {
-                const change = Math.floor(Math.random() * 300) - 200;
-                const newPrice = Math.max(9900, r.price_sek + change);
-                r.price_sek = newPrice;
-                r.history = [...r.history.slice(1), newPrice];
-            });
-
-            renderDynamicData();
         }
 
         // Boot
