@@ -29,7 +29,7 @@
                 </h1>
                 <p class="text-zinc-500 flex items-center gap-2 mt-2">
                     <i data-lucide="clock" class="w-3.5 h-3.5"></i>
-                    Last updated: <span id="last-updated-text">04/05/2026 09:08</span>
+                    Last updated: <span id="last-updated-text">04/05/2026 20:37</span>
                 </p>
             </div>
         </div>
@@ -61,7 +61,7 @@
                     </div>
                     <div class="px-4 py-2 bg-black rounded-lg border border-zinc-800 text-sm flex items-center gap-2 font-medium">
                         <i data-lucide="trending-up" class="w-4 h-4 text-green-500"></i>
-                        Lowest Market Price: <span id="hero-lowest-price">...</span>
+                        Lowest verified market price within 30 days: <span id="hero-lowest-price">...</span>
                     </div>
                 </div>
             </div>
@@ -74,14 +74,14 @@
                 Expanded Hardware Specifications
             </h3>
             
-            <div id="specs-container">
-                <!-- Javascript will inject the detailed sections here to keep the HTML clean -->
+            <div id="specs-container" class="flex flex-col">
+                <!-- Javascript will inject the dropdown accordion sections here -->
             </div>
         </div>
 
         <!-- CHART & PRICING SECTION -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 pt-4">
-            <div class="lg:col-span-2 bg-zinc-900 border border-zinc-800 rounded-3xl p-6 shadow-xl flex flex-col">
+        <div class="pt-4">
+            <div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-6 shadow-xl flex flex-col">
                 <div class="mb-4">
                     <h3 class="text-xl font-bold flex items-center gap-2 mb-1">
                         <i data-lucide="trending-down" class="w-5 h-5 text-orange-500"></i>
@@ -100,24 +100,6 @@
 
                 <div class="h-[350px] w-full mt-auto relative">
                     <canvas id="priceChart"></canvas>
-                </div>
-            </div>
-
-            <!-- Quick Stats Panel -->
-            <div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-6 flex flex-col gap-4">
-                <h3 class="text-xl font-bold mb-2">Market Sentiment</h3>
-                <div class="p-4 rounded-2xl bg-black border border-zinc-800">
-                    <span class="text-zinc-500 text-sm">Best Current Price</span>
-                    <p class="text-2xl font-black text-white mt-1" id="stat-lowest-price">...</p>
-                </div>
-                <div class="p-4 rounded-2xl bg-black border border-zinc-800">
-                    <span class="text-zinc-500 text-sm">Target MSRP (Estimated)</span>
-                    <p class="text-2xl font-black text-zinc-400 mt-1" id="stat-target-price">...</p>
-                </div>
-                <div class="mt-auto">
-                    <p class="text-xs text-zinc-600 mb-4 italic">
-                        State simulation applies realistic pricing volatility across active retailers.
-                    </p>
                 </div>
             </div>
         </div>
@@ -192,22 +174,19 @@
     <!-- Application Logic -->
     <script>
         const exchangeRate = 0.11;
-        // Updating to the current date and time (CEST)
-        let lastUpdatedTime = "04/05/2026 09:08";
-        // Shifting history forward to accommodate today's date
+        let lastUpdatedTime = "04/05/2026 20:37";
         let historyDays = ['28/04', '29/04', '01/05', '03/05', '04/05'];
         let chartInstance = null;
         
-        // Mapping of unique brand colors for each active retailer per user request
         const brandColors = {
-            "Amazon Sweden": "#9b8767", // Dark Beige
-            "CDON": "#065f46",          // Dark Green
-            "Elgiganten": "#10b981",    // Emerald Green
-            "Inet": "#ef4444",          // Red
-            "Komplett": "#d4af37",      // Gold
-            "NetOnNet": "#7f1d1d",      // Dark Red
-            "Proshop": "#ef4444",       // Red
-            "Webhallen": "#4169e1"      // Royal Blue
+            "Amazon Sweden": "#9b8767", 
+            "CDON": "#065f46",          
+            "Elgiganten": "#10b981",    
+            "Inet": "#ef4444",          
+            "Komplett": "#d4af37",      
+            "NetOnNet": "#7f1d1d",      
+            "Proshop": "#ef4444",       
+            "Webhallen": "#4169e1"      
         };
 
         let appData = {
@@ -231,7 +210,6 @@
                     "Advanced Encryption Standard New Instructions (AES-NI)", "AMD Enhanced Virus Protection (NX bit)", "AMD Shadow Stack"
                 ]
             },
-            // Adjusted pricing history and values to match latest simulated figures for May 4, 2026
             retailers: [
                 { retailer: "Amazon Sweden", price_sek: 10390, url: "https://www.amazon.se/-/en/AMD-100-100001978WOF/dp/B0GTRTJSNZ/", history: [10420, 10390, 10388, 10390, 10390], shipping_cost_sek: 0, delivery_time: "1-2 days" },
                 { retailer: "CDON", price_sek: 14200, url: "https://cdon.se/produkt/processor-amd-ryzentm-9-9950x3d2-16-karnor-32-tradar-boostfrekvens-upp-till-560-ghz-8740e716c6dc5ff4/", history: [15500, 14804, 14804, 14500, 14200], shipping_cost_sek: 49, delivery_time: "2-5 days" },
@@ -244,7 +222,6 @@
             ]
         };
 
-        // Sort retailers alphabetically
         appData.retailers.sort((a, b) => a.retailer.localeCompare(b.retailer));
 
         const techDefinitions = {
@@ -288,12 +265,15 @@
             return `${usd} (${sek.toLocaleString('sv-SE')} SEK)`;
         };
 
-        const getLowestPrice = () => Math.min(...appData.retailers.map(r => r.price_sek));
+        // Calculates the absolute lowest price across all retailers' entire recorded history
+        const getLowestHistoryPrice = () => {
+            return Math.min(...appData.retailers.flatMap(r => r.history));
+        };
 
         function generateTooltipHTML(description) {
             if (!description) return '';
             return `
-                <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-[280px] p-4 bg-zinc-800 text-zinc-200 text-sm font-normal normal-case tracking-normal rounded-xl shadow-2xl border border-zinc-700 invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all z-50 pointer-events-none">
+                <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-[280px] p-4 bg-zinc-800 text-zinc-200 text-sm font-normal normal-case tracking-normal rounded-xl shadow-2xl border border-zinc-700 invisible opacity-0 group-hover/tooltip:visible group-hover/tooltip:opacity-100 transition-all z-50 pointer-events-none">
                     ${description}
                     <div class="absolute top-full left-1/2 -translate-x-1/2 border-8 border-transparent border-t-zinc-700"></div>
                     <div class="absolute top-full left-1/2 -translate-x-1/2 border-[7px] border-transparent border-t-zinc-800 -mt-[1px]"></div>
@@ -303,9 +283,18 @@
 
         function createSpecItem(label, value, icon, span = 1, defKey = null) {
             const description = defKey ? techDefinitions[defKey] : null;
-            const spanClass = span > 1 ? `md:col-span-${span}` : '';
+            
+            // Map column spans strictly so the Tailwind JIT compiler detects the literal classes
+            const colSpans = {
+                1: '',
+                2: 'md:col-span-2',
+                3: 'md:col-span-3',
+                4: 'md:col-span-4'
+            };
+            const spanClass = colSpans[span] || '';
+            
             return `
-                <div class="p-4 rounded-2xl bg-black border border-zinc-800 flex flex-col gap-2 relative group ${spanClass}">
+                <div class="p-4 rounded-2xl bg-black border border-zinc-800 flex flex-col gap-2 relative group/tooltip ${spanClass}">
                     <div class="text-zinc-500 flex items-center justify-between text-sm font-medium uppercase tracking-wider">
                         <div class="flex items-center gap-2">
                             <i data-lucide="${icon}" class="w-4 h-4 text-zinc-400"></i>
@@ -322,7 +311,7 @@
         function createFeatureTag(label, defKey) {
             const description = techDefinitions[defKey];
             return `
-                <div class="relative group">
+                <div class="relative group/tooltip">
                     <div class="px-3 py-2 bg-black rounded-xl border border-zinc-800 text-sm flex justify-between items-center gap-2 text-zinc-300 hover:bg-zinc-800/50 transition-colors cursor-help">
                         <div class="flex items-center gap-2">
                             <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-500 shrink-0"></i>
@@ -335,83 +324,113 @@
             `;
         }
 
+        function createAccordionSection(title, icon, contentHtml, position, isOpen = false) {
+            let detailsClasses = "group bg-zinc-900 shadow-xl [&_summary::-webkit-details-marker]:hidden relative z-0 focus-within:z-10";
+            let summaryClasses = "flex items-center justify-between p-6 cursor-pointer text-lg font-bold text-zinc-300 hover:bg-zinc-800/50 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-inset";
+            
+            if (position === 'top') {
+                detailsClasses += " rounded-t-3xl border border-zinc-800";
+                summaryClasses += " rounded-t-3xl";
+            } else if (position === 'middle') {
+                detailsClasses += " rounded-none border border-zinc-800 -mt-px";
+                summaryClasses += " rounded-none";
+            } else if (position === 'bottom') {
+                detailsClasses += " rounded-b-3xl border border-zinc-800 -mt-px";
+                summaryClasses += " rounded-b-3xl";
+            }
+
+            return `
+                <details class="${detailsClasses}" ${isOpen ? 'open' : ''}>
+                    <summary class="${summaryClasses}">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="${icon}" class="w-5 h-5 ${icon === 'shield-check' ? 'text-emerald-500' : 'text-zinc-400'}"></i>
+                            ${title}
+                        </div>
+                        <div class="text-zinc-500 group-open:rotate-180 transition-transform duration-300">
+                            <i data-lucide="chevron-down" class="w-5 h-5"></i>
+                        </div>
+                    </summary>
+                    <div class="px-6 pb-6">
+                        <div class="pt-6 border-t border-zinc-800/80">
+                            ${contentHtml}
+                        </div>
+                    </div>
+                </details>
+            `;
+        }
+
         function renderSpecs() {
             const p = appData.processor;
             const container = document.getElementById('specs-container');
             
-            container.innerHTML = `
-                <div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-6 shadow-xl">
-                    <h4 class="text-lg font-bold mb-4 text-zinc-300 border-b border-zinc-800 pb-2">Core Architecture & Thermals</h4>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                        ${createSpecItem("Base Clock", `${p.base_clock_ghz} GHz`, "activity")}
-                        ${createSpecItem("Boost Clock", `Up to ${p.boost_clock_ghz} GHz`, "zap")}
-                        ${createSpecItem("Total Cache", p.cache.total, "database")}
-                        ${createSpecItem("L3 Cache", p.cache.l3, "layers")}
-                        ${createSpecItem("L2 Cache", p.cache.l2, "layers")}
-                        ${createSpecItem("L1 Cache", p.cache.l1, "layers")}
-                        ${createSpecItem("Default TDP", `${p.tdp_w} W`, "zap")}
-                        ${createSpecItem("Max Temp (Tjmax)", `${p.max_temp_c} °C`, "thermometer")}
-                        ${createSpecItem("CPU Lithography", p.lithography_cpu, "cpu")}
-                        ${createSpecItem("Package Die Count", p.package_die_count, "box")}
-                    </div>
-                </div>
-
-                <div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-6 shadow-xl">
-                    <h4 class="text-lg font-bold mb-4 text-zinc-300 border-b border-zinc-800 pb-2">General Specifications</h4>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                        ${createSpecItem("Multithreading (SMT)", p.smt, "layers", 1, "smt")}
-                        ${createSpecItem("I/O Die Technology", p.lithography_io, "cpu", 1, "lithography_io")}
-                        ${createSpecItem("AMD EXPO Memory", p.expo, "settings", 1, "expo")}
-                        ${createSpecItem("Curve Optimizer", p.curve_optimizer, "activity", 1, "curve_optimizer")}
-                        ${createSpecItem("Ryzen Master Support", p.ryzen_master, "settings", 1, "ryzen_master")}
-                        ${createSpecItem("Overclocking", p.unlocked, "unlock")}
-                        ${createSpecItem("Supported Chipsets", p.chipsets, "layers", 2, "chipsets")}
-                        ${createSpecItem("OS Support", p.os_support, "monitor-play", 2)}
-                        ${createSpecItem("Supported Extensions", p.extensions, "terminal", 4, "extensions")}
-                    </div>
-                </div>
-
-                <div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-6 shadow-xl">
-                    <h4 class="text-lg font-bold mb-4 text-zinc-300 border-b border-zinc-800 pb-2">Connectivity & Memory Storage</h4>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                        ${createSpecItem("RAM Generation", p.ram_generation, "hard-drive")}
-                        ${createSpecItem("Max Memory", p.max_memory, "hard-drive")}
-                        ${createSpecItem("Memory Subtype", p.memory_subtype, "hard-drive", 1, "memory_subtype")}
-                        ${createSpecItem("NVMe Support", p.nvme, "database", 1, "nvme")}
-                        ${createSpecItem("PCI Express", p.pcie, "activity")}
-                        ${createSpecItem("Native PCIe Lanes", p.pcie_lanes, "network", 1, "pcie_lanes")}
-                        ${createSpecItem("USB 3.2 Gen 2", p.usb_3_2_gen2, "usb", 1, "usb_3_2_gen2")}
-                        ${createSpecItem("USB 2.0", p.usb_2_0, "usb", 1, "usb_2_0")}
-                    </div>
-                </div>
-
-                <div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-6 shadow-xl">
-                    <h4 class="text-lg font-bold mb-4 text-zinc-300 border-b border-zinc-800 pb-2">Graphics Capabilities</h4>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                        ${createSpecItem("Graphics Model", p.graphics_model, "monitor", 1, "graphics_model")}
-                        ${createSpecItem("Graphics Cores", p.graphics_cores, "cpu", 1, "graphics_cores")}
-                        ${createSpecItem("Graphics Frequency", p.graphics_frequency, "activity", 1)}
-                        ${createSpecItem("Type-C DP Alt Mode", p.dp_alt_mode, "monitor-play", 1, "dp_alt_mode")}
-                    </div>
-                </div>
-
-                <div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-6 shadow-xl">
-                    <h4 class="text-lg font-bold mb-4 text-zinc-300 border-b border-zinc-800 pb-2 flex items-center gap-2">
-                        <i data-lucide="shield-check" class="w-5 h-5 text-emerald-500"></i>
-                        Security & Virtualization Features
-                    </h4>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                        ${p.security_features.map(f => createFeatureTag(f, f)).join('')}
-                    </div>
+            const archHtml = `
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    ${createSpecItem("Base Clock", `${p.base_clock_ghz} GHz`, "activity")}
+                    ${createSpecItem("Boost Clock", `Up to ${p.boost_clock_ghz} GHz`, "zap")}
+                    ${createSpecItem("Total Cache", p.cache.total, "database")}
+                    ${createSpecItem("L3 Cache", p.cache.l3, "layers")}
+                    ${createSpecItem("L2 Cache", p.cache.l2, "layers")}
+                    ${createSpecItem("L1 Cache", p.cache.l1, "layers")}
+                    ${createSpecItem("Default TDP", `${p.tdp_w} W`, "zap")}
+                    ${createSpecItem("Max Temp (Tjmax)", `${p.max_temp_c} °C`, "thermometer")}
+                    ${createSpecItem("CPU Lithography", p.lithography_cpu, "cpu")}
+                    ${createSpecItem("Package Die Count", p.package_die_count, "box")}
                 </div>
             `;
+
+            const genHtml = `
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    ${createSpecItem("Multithreading (SMT)", p.smt, "layers", 1, "smt")}
+                    ${createSpecItem("I/O Die Technology", p.lithography_io, "cpu", 1, "lithography_io")}
+                    ${createSpecItem("AMD EXPO Memory", p.expo, "settings", 1, "expo")}
+                    ${createSpecItem("Curve Optimizer", p.curve_optimizer, "activity", 1, "curve_optimizer")}
+                    ${createSpecItem("Ryzen Master Support", p.ryzen_master, "settings", 1, "ryzen_master")}
+                    ${createSpecItem("Overclocking", p.unlocked, "unlock")}
+                    ${createSpecItem("Supported Chipsets", p.chipsets, "layers", 2, "chipsets")}
+                    ${createSpecItem("OS Support", p.os_support, "monitor-play", 2)}
+                    ${createSpecItem("Supported Extensions", p.extensions, "terminal", 4, "extensions")}
+                </div>
+            `;
+
+            const connHtml = `
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    ${createSpecItem("RAM Generation", p.ram_generation, "hard-drive")}
+                    ${createSpecItem("Max Memory", p.max_memory, "hard-drive")}
+                    ${createSpecItem("Memory Subtype", p.memory_subtype, "hard-drive", 1, "memory_subtype")}
+                    ${createSpecItem("NVMe Support", p.nvme, "database", 1, "nvme")}
+                    ${createSpecItem("PCI Express", p.pcie, "activity")}
+                    ${createSpecItem("Native PCIe Lanes", p.pcie_lanes, "network", 1, "pcie_lanes")}
+                    ${createSpecItem("USB 3.2 Gen 2", p.usb_3_2_gen2, "usb", 1, "usb_3_2_gen2")}
+                    ${createSpecItem("USB 2.0", p.usb_2_0, "usb", 1, "usb_2_0")}
+                </div>
+            `;
+
+            const graphHtml = `
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                    ${createSpecItem("Graphics Model", p.graphics_model, "monitor", 1, "graphics_model")}
+                    ${createSpecItem("Graphics Cores", p.graphics_cores, "cpu", 1, "graphics_cores")}
+                    ${createSpecItem("Graphics Frequency", p.graphics_frequency, "activity", 1)}
+                    ${createSpecItem("Type-C DP Alt Mode", p.dp_alt_mode, "monitor-play", 1, "dp_alt_mode")}
+                </div>
+            `;
+
+            const secHtml = `
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    ${p.security_features.map(f => createFeatureTag(f, f)).join('')}
+                </div>
+            `;
+
+            container.innerHTML = 
+                createAccordionSection("Core Architecture & Thermals", "cpu", archHtml, "top", true) +
+                createAccordionSection("General Specifications", "sliders", genHtml, "middle", false) +
+                createAccordionSection("Connectivity & Memory Storage", "network", connHtml, "middle", false) +
+                createAccordionSection("Graphics Capabilities", "monitor", graphHtml, "middle", false) +
+                createAccordionSection("Security & Virtualization Features", "shield-check", secHtml, "bottom", false);
         }
 
         function renderDynamicData() {
             document.getElementById('last-updated-text').textContent = lastUpdatedTime;
-            document.getElementById('hero-lowest-price').textContent = formatPrice(getLowestPrice());
-            document.getElementById('stat-lowest-price').textContent = formatPrice(getLowestPrice());
-            document.getElementById('stat-target-price').textContent = formatPrice(10390);
+            document.getElementById('hero-lowest-price').textContent = formatPrice(getLowestHistoryPrice());
             
             const tbody = document.getElementById('retailer-table-body');
             const retailersList = appData.retailers; 
@@ -454,19 +473,14 @@
                     </td>
                 </tr>
             `}).join('');
-
-            lucide.createIcons();
-            updateChart();
         }
 
-        // --- Custom ChartJS Plugin: Draws the labels directly on the canvas to handle the "Today's Price Tags" requirement
         const lastPointLabelPlugin = {
             id: 'lastPointLabelPlugin',
-            afterDatasetsDraw(chart, args, options) {
+            afterDatasetsDraw(chart) {
                 const { ctx } = chart;
                 const tags = [];
                 
-                // 1. Gather all the latest points for each visible dataset
                 chart.data.datasets.forEach((dataset, i) => {
                     const meta = chart.getDatasetMeta(i);
                     if (!meta.hidden && meta.data.length > 0) {
@@ -477,14 +491,13 @@
                             value: value,
                             x: lastPoint.x,
                             y: lastPoint.y,
-                            targetY: lastPoint.y, // Target Y is mutable for anti-collision
+                            targetY: lastPoint.y, 
                             color: dataset.borderColor,
                             text: `${dataset.label}: ${value.toLocaleString('sv-SE')} kr`
                         });
                     }
                 });
 
-                // 2. Iterative Relaxation (Anti-Collision Algorithm)
                 const LABEL_HEIGHT = 28;
                 tags.sort((a, b) => a.y - b.y); 
                 
@@ -499,7 +512,6 @@
                     }
                 }
                 
-                // 3. Draw the resulting Tags and connector lines
                 tags.forEach(tag => {
                     ctx.save();
                     ctx.font = '600 11px system-ui, -apple-system, sans-serif';
@@ -607,12 +619,6 @@
                     }
                 }
             });
-        }
-
-        function updateChart() {
-            if (!chartInstance) return;
-            chartInstance.data = getChartData();
-            chartInstance.update();
         }
 
         // Boot
