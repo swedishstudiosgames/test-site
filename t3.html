@@ -13,25 +13,16 @@
     
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
-
-    <style>
-        body { font-family: system-ui, -apple-system, sans-serif; }
-    </style>
 </head>
-<body class="bg-[#0a0a0a] text-zinc-100 p-4 md:p-8 min-h-screen">
+<body class="bg-[#0a0a0a] text-zinc-100 p-4 md:p-8 min-h-screen font-sans">
     <div class="max-w-6xl mx-auto space-y-8">
         
         <!-- Header section -->
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-            <div>
-                <h1 class="text-3xl md:text-4xl font-bold tracking-tight bg-gradient-to-r from-orange-500 to-red-600 bg-clip-text text-transparent">
-                    AMD Price Dashboard
-                </h1>
-                <p class="text-zinc-500 flex items-center gap-2 mt-2">
-                    <i data-lucide="clock" class="w-3.5 h-3.5"></i>
-                    Last updated: <span id="last-updated-text">04/05/2026 20:37</span>
-                </p>
-            </div>
+        <div class="flex justify-start">
+            <p class="text-zinc-500 flex items-center gap-2">
+                <i data-lucide="clock" class="w-3.5 h-3.5"></i>
+                Last updated: <span id="last-updated-text">07/05/2026 21:34</span>
+            </p>
         </div>
 
         <!-- Hero Product Card -->
@@ -137,8 +128,6 @@
         </div>
 
         <footer class="text-center text-zinc-600 text-sm pb-12 space-y-6 mt-8">
-            <p>Currency conversion fixed at 1,00 SEK = US$ 0.11</p>
-            
             <div class="inline-block text-left bg-zinc-900/50 p-6 rounded-xl border border-zinc-800 max-w-2xl mx-auto">
                 <strong class="block text-zinc-400 mb-3 uppercase tracking-wider text-xs">Sources & Citations</strong>
                 <ul class="list-none space-y-2 text-xs text-zinc-500">
@@ -173,10 +162,8 @@
 
     <!-- Application Logic -->
     <script>
-        const exchangeRate = 0.11;
-        let lastUpdatedTime = "04/05/2026 20:37";
-        let historyDays = ['28/04', '29/04', '01/05', '03/05', '04/05'];
-        let chartInstance = null;
+        const lastUpdatedTime = "07/05/2026 21:34";
+        const historyDays = ['28/04', '29/04', '01/05', '03/05', '04/05', '07/05'];
         
         const brandColors = {
             "Amazon Sweden": "#9b8767", 
@@ -189,7 +176,7 @@
             "Webhallen": "#4169e1"      
         };
 
-        let appData = {
+        const appData = {
             processor: {
                 base_clock_ghz: 4.3, boost_clock_ghz: 5.6, tdp_w: 200, max_temp_c: 95, 
                 package_die_count: 3, smt: "Supported", expo: "Supported", curve_optimizer: "Supported",
@@ -211,14 +198,14 @@
                 ]
             },
             retailers: [
-                { retailer: "Amazon Sweden", price_sek: 10390, url: "https://www.amazon.se/-/en/AMD-100-100001978WOF/dp/B0GTRTJSNZ/", history: [10420, 10390, 10388, 10390, 10390], shipping_cost_sek: 0, delivery_time: "1-2 days" },
-                { retailer: "CDON", price_sek: 14200, url: "https://cdon.se/produkt/processor-amd-ryzentm-9-9950x3d2-16-karnor-32-tradar-boostfrekvens-upp-till-560-ghz-8740e716c6dc5ff4/", history: [15500, 14804, 14804, 14500, 14200], shipping_cost_sek: 49, delivery_time: "2-5 days" },
-                { retailer: "Elgiganten", price_sek: 10390, url: "https://www.elgiganten.se/product/gaming/datorkomponenter/processor-cpu/amd-ryzen-9-9950x3d2-processor/1083223", history: [10390, 10390, 10390, 10390, 10390], shipping_cost_sek: 49, delivery_time: "1-3 days" },
-                { retailer: "Inet", price_sek: 10390, url: "https://www.inet.se/produkt/5307669/amd-ryzen-9-9950x3d2-4-3ghz-208mb", history: [10449, 10399, 10399, 10390, 10390], shipping_cost_sek: 0, delivery_time: "1-2 days" },
-                { retailer: "Komplett", price_sek: 10390, url: "https://www.komplett.se/product/1338752/datorutrustning/datorkomponenter/processor/amd-ryzen-9-9950x3d2-dual-edition-cpu", history: [99999, 10390, 10390, 10390, 10390], shipping_cost_sek: 0, delivery_time: "1-3 days" },
-                { retailer: "NetOnNet", price_sek: 10390, url: "https://www.netonnet.se/art/datorkomponenter/processor/amd-am5-socket/amd-ryzen-9-9950x3d2-16c32t-5-6ghz-box/1065195.19286/", history: [10390, 10390, 10390, 10390, 10390], shipping_cost_sek: 29, delivery_time: "3-4 days" },
-                { retailer: "Proshop", price_sek: 10390, url: "https://www.proshop.se/CPU/AMD-Ryzen-9-9950X3D2-Dual-Edition-CPU-16-kaernor-43-GHz-AMD-AM5-AMD-Boxed-utan-kylare/3456874", history: [10390, 10390, 10390, 10390, 10390], shipping_cost_sek: 0, delivery_time: "1-2 days" },
-                { retailer: "Webhallen", price_sek: 10390, url: "https://www.webhallen.com/se/product/397499-AMD-Ryzen-9-9950X3D2-Dual-Edition-16-Cores-32-Threads-5-6GHz", history: [10390, 10390, 10390, 10390, 10390], shipping_cost_sek: 0, delivery_time: "5-7 days" }
+                { retailer: "Amazon Sweden", price_sek: 10390, url: "https://www.amazon.se/-/en/AMD-100-100001978WOF/dp/B0GTRTJSNZ/", history: [10420, 10390, 10388, 10390, 10390, 10390], shipping_cost_sek: 0, delivery_time: "1-2 days" },
+                { retailer: "CDON", price_sek: 14721, url: "https://cdon.se/produkt/processor-amd-ryzentm-9-9950x3d2-16-karnor-32-tradar-boostfrekvens-upp-till-560-ghz-8740e716c6dc5ff4/", history: [15500, 14804, 14804, 14500, 14200, 14721], shipping_cost_sek: 49, delivery_time: "2-5 days" },
+                { retailer: "Elgiganten", price_sek: 10390, url: "https://www.elgiganten.se/product/gaming/datorkomponenter/processor-cpu/amd-ryzen-9-9950x3d2-processor/1083223", history: [10390, 10390, 10390, 10390, 10390, 10390], shipping_cost_sek: 49, delivery_time: "1-3 days" },
+                { retailer: "Inet", price_sek: 10399, url: "https://www.inet.se/produkt/5307669/amd-ryzen-9-9950x3d2-4-3ghz-208mb", history: [10449, 10399, 10399, 10390, 10390, 10399], shipping_cost_sek: 0, delivery_time: "1-2 days" },
+                { retailer: "Komplett", price_sek: 10390, url: "https://www.komplett.se/product/1338752/datorutrustning/datorkomponenter/processor/amd-ryzen-9-9950x3d2-dual-edition-cpu", history: [99999, 10390, 10390, 10390, 10390, 10390], shipping_cost_sek: 0, delivery_time: "1-3 days" },
+                { retailer: "NetOnNet", price_sek: 10390, url: "https://www.netonnet.se/art/datorkomponenter/processor/amd-am5-socket/amd-ryzen-9-9950x3d2-16c32t-5-6ghz-box/1065195.19286/", history: [10390, 10390, 10390, 10390, 10390, 10390], shipping_cost_sek: 29, delivery_time: "3-4 days" },
+                { retailer: "Proshop", price_sek: 10390, url: "https://www.proshop.se/CPU/AMD-Ryzen-9-9950X3D2-Dual-Edition-CPU-16-kaernor-43-GHz-AMD-AM5-AMD-Boxed-utan-kylare/3456874", history: [10390, 10390, 10390, 10390, 10390, 10390], shipping_cost_sek: 0, delivery_time: "1-2 days" },
+                { retailer: "Webhallen", price_sek: 10390, url: "https://www.webhallen.com/se/product/397499-AMD-Ryzen-9-9950X3D2-Dual-Edition-16-Cores-32-Threads-5-6GHz", history: [10390, 10390, 10390, 10390, 10390, 10390], shipping_cost_sek: 0, delivery_time: "5-7 days" }
             ]
         };
 
@@ -260,9 +247,7 @@
         };
 
         const formatPrice = (sek) => {
-            const usdFormat = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(sek * exchangeRate);
-            const usd = usdFormat.replace('$', 'US$');
-            return `${usd} (${sek.toLocaleString('sv-SE')} SEK)`;
+            return `${sek.toLocaleString('sv-SE')} SEK`;
         };
 
         // Calculates the absolute lowest price across all retailers' entire recorded history
@@ -439,7 +424,7 @@
             tbody.innerHTML = retailersList.map(r => {
                 const shippingHtml = r.shipping_cost_sek === 0 
                     ? `<span class="text-emerald-500 font-semibold tracking-wide">Free Shipping</span>` 
-                    : `<span class="text-zinc-400">+${formatPrice(r.shipping_cost_sek)} shipping</span>`;
+                    : `<span class="text-zinc-400">+${formatPrice(r.shipping_cost_sek)}</span>`;
 
                 return `
                 <tr class="hover:bg-zinc-800/30 transition-colors group">
@@ -493,7 +478,7 @@
                             y: lastPoint.y,
                             targetY: lastPoint.y, 
                             color: dataset.borderColor,
-                            text: `${dataset.label}: ${value.toLocaleString('sv-SE')} kr`
+                            text: `${dataset.label}: ${value.toLocaleString('sv-SE')} SEK`
                         });
                     }
                 });
@@ -577,7 +562,7 @@
         function initChart() {
             const ctx = document.getElementById('priceChart').getContext('2d');
             
-            chartInstance = new Chart(ctx, {
+            new Chart(ctx, {
                 type: 'line',
                 data: getChartData(),
                 plugins: [lastPointLabelPlugin],
@@ -589,7 +574,7 @@
                         intersect: false,
                     },
                     layout: {
-                        padding: { top: 30, bottom: 30, right: 190, left: 10 } 
+                        padding: { top: 30, bottom: 30, right: 160, left: 15 } 
                     },
                     plugins: {
                         legend: { display: false },
@@ -613,7 +598,7 @@
                             grid: { color: '#27272a', borderDash: [3, 3], drawBorder: false },
                             ticks: { 
                                 color: '#52525b', font: { family: 'system-ui', size: 12 },
-                                callback: function(value) { return value + ' kr'; }
+                                callback: function(value) { return value.toLocaleString('sv-SE') + ' SEK'; }
                             }
                         }
                     }
