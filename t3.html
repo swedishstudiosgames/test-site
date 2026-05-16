@@ -28,17 +28,17 @@
         <!-- Hero Product Card -->
         <div class="bg-zinc-900/50 border border-zinc-800 rounded-3xl p-6 flex flex-col md:flex-row gap-8 items-center shadow-2xl">
             <div class="w-full md:w-56 h-56 bg-black rounded-2xl overflow-hidden flex items-center justify-center border border-zinc-800 p-4 shrink-0">
-                <img id="hero-image" src="https://www.amd.com/content/dam/amd/en/images/products/processors/ryzen/4270752-amd-ryzen-9000-series-x3d2/4270752-amd-ryzen-9000-series-x3d2-product-1.jpg" alt="CPU" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%2352525b\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'><rect x=\'4\' y=\'4\' width=\'16\' height=\'16\' rx=\'2\' ry=\'2\'></rect><rect x=\'9\' y=\'9\' width=\'6\' height=\'6\'></rect><line x1=\'9\' y1=\'1\' x2=\'9\' y2=\'4\'></line><line x1=\'15\' y1=\'1\' x2=\'15\' y2=\'4\'></line><line x1=\'9\' y1=\'20\' x2=\'9\' y2=\'23\'></line><line x1=\'15\' y1=\'20\' x2=\'15\' y2=\'23\'></line><line x1=\'20\' y1=\'9\' x2=\'23\' y2=\'9\'></line><line x1=\'20\' y1=\'14\' x2=\'23\' y2=\'14\'></line><line x1=\'1\' y1=\'9\' x2=\'4\' y2=\'9\'></line><line x1=\'1\' y1=\'14\' x2=\'4\' y2=\'14\'></line></svg>'" class="w-full h-full object-contain">
+                <img src="https://www.amd.com/content/dam/amd/en/images/products/processors/ryzen/4270752-amd-ryzen-9000-series-x3d2/4270752-amd-ryzen-9000-series-x3d2-product-1.jpg" alt="CPU" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%2352525b\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'><rect x=\'4\' y=\'4\' width=\'16\' height=\'16\' rx=\'2\' ry=\'2\'></rect><rect x=\'9\' y=\'9\' width=\'6\' height=\'6\'></rect><line x1=\'9\' y1=\'1\' x2=\'9\' y2=\'4\'></line><line x1=\'15\' y1=\'1\' x2=\'15\' y2=\'4\'></line><line x1=\'9\' y1=\'20\' x2=\'9\' y2=\'23\'></line><line x1=\'15\' y1=\'20\' x2=\'15\' y2=\'23\'></line><line x1=\'20\' y1=\'9\' x2=\'23\' y2=\'9\'></line><line x1=\'20\' y1=\'14\' x2=\'23\' y2=\'14\'></line><line x1=\'1\' y1=\'9\' x2=\'4\' y2=\'9\'></line><line x1=\'1\' y1=\'14\' x2=\'4\' y2=\'14\'></line></svg>'" class="w-full h-full object-contain">
             </div>
             <div class="flex-1">
-                <span class="text-xs font-bold uppercase tracking-widest text-orange-500 mb-2 block" id="hero-architecture">
+                <span class="text-xs font-bold uppercase tracking-widest text-orange-500 mb-2 block">
                     Zen 5 (Granite Ridge)
                 </span>
-                <h2 class="text-3xl md:text-5xl font-black mb-3" id="hero-title">AMD Ryzen 9 9950X3D2 Dual Edition</h2>
-                <p class="text-zinc-300 font-medium text-lg mb-3" id="hero-tagline">
+                <h2 class="text-3xl md:text-5xl font-black mb-3">AMD Ryzen 9 9950X3D2 Dual Edition</h2>
+                <p class="text-zinc-300 font-medium text-lg mb-3">
                     The World's First Dual AMD 3D V-Cache™ Technology-Based Desktop Processor to Unlock a New Future of Computing for Developers and Creators.
                 </p>
-                <p class="text-zinc-500 text-sm md:text-base mb-6 max-w-3xl leading-relaxed border-l-2 border-orange-500 pl-4" id="hero-description">
+                <p class="text-zinc-500 text-sm md:text-base mb-6 max-w-3xl leading-relaxed border-l-2 border-orange-500 pl-4">
                     Built for demanding developers, the AMD Ryzen 9 9950X3D2 Dual Edition processor combines high-performance “Zen 5” core technology with dual 2nd Gen AMD 3D V-Cache technology across all 16 cores, delivering 208MB of total cache for expanded cache capacity and low latency. The result is exceptional responsiveness, increased throughput and flexibility to power next-generation development and creation workflows.
                 </p>
                 <div class="flex flex-wrap gap-3">
@@ -434,7 +434,7 @@
                     <td class="px-6 py-5">
                         <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${r.price_sek > 11000 ? 'bg-amber-500/10 text-amber-500 border-amber-500/20' : 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'}">
                             <div class="w-1.5 h-1.5 rounded-full shrink-0 ${r.price_sek > 11000 ? 'bg-amber-500' : 'bg-emerald-500'}"></div>
-                            ${r.price_sek > 11000 ? 'ELEVATED PRICE' : 'NORMAL RANGE'}
+                            ${r.price_sek > 11000 ? 'UNCERTAIN' : 'IN-STOCK'}
                         </span>
                     </td>
                     <td class="px-6 py-5 text-right font-mono">
@@ -520,9 +520,9 @@
                     ctx.fill();
                     
                     const hex = tag.color.replace('#', '');
-                    const r = parseInt(hex.substr(0, 2), 16);
-                    const g = parseInt(hex.substr(2, 2), 16);
-                    const b = parseInt(hex.substr(4, 2), 16);
+                    const r = parseInt(hex.substring(0, 2), 16);
+                    const g = parseInt(hex.substring(2, 4), 16);
+                    const b = parseInt(hex.substring(4, 6), 16);
                     const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
                     ctx.fillStyle = (yiq >= 128) ? '#000000' : '#ffffff';
                     
@@ -597,7 +597,7 @@
                             grid: { color: '#27272a', borderDash: [3, 3], drawBorder: false },
                             ticks: { 
                                 color: '#52525b', font: { family: 'system-ui', size: 12 },
-                                callback: function(value) { return value.toLocaleString('sv-SE') + ' SEK'; }
+                                callback: formatPrice
                             }
                         }
                     }
