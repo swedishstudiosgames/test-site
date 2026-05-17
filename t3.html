@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AMD Ryzen 9 9950X3D2 Dashboard</title>
+    <title>AMD Ryzen 9 9950X3D2 DualEdition</title>
     
     <!-- Tailwind CSS for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -21,7 +21,7 @@
         <div class="flex justify-start">
             <p class="text-zinc-500 flex items-center gap-2">
                 <i data-lucide="clock" class="w-3.5 h-3.5"></i>
-                Last updated: <span id="last-updated-text">16/05/2026 12:40</span>
+                Last updated: <span id="last-updated-text">17/05/2026 23:32</span>
             </p>
         </div>
 
@@ -95,12 +95,12 @@
             </div>
         </div>
 
-        <!-- CDON Reseller Warning -->
-        <div class="bg-amber-500/10 border border-amber-500/20 text-amber-400 text-sm p-4 rounded-xl flex items-start gap-3 mb-2">
-            <i data-lucide="info" class="w-5 h-5 shrink-0 mt-0.5"></i>
+        <!-- Retailer Removal Notice (Replaced CDON Warning) -->
+        <div class="bg-red-500/10 border border-red-500/20 text-red-400 text-sm p-4 rounded-xl flex items-start gap-3 mb-2">
+            <i data-lucide="alert-circle" class="w-5 h-5 shrink-0 mt-0.5"></i>
             <div>
-                <strong class="block text-amber-300 mb-1">Consumer Advisory: Third-Party Reseller Pricing</strong>
-                The current listed price at CDON is significantly higher than the standard market range. Customers are strongly advised to exercise caution and verify the reputation of the third-party reseller on the platform, as unusually high prices can sometimes indicate price gouging or potentially fraudulent listings.
+                <strong class="block text-red-300 mb-1">Retailer Update: CDON Removed</strong>
+                We have removed CDON from the list of tracked retailers due to the suspicious nature of their rapidly fluctuating pricing.
             </div>
         </div>
 
@@ -159,14 +159,16 @@
             </div>
         </footer>
     </div>
+
     <!-- Application Logic -->
     <script>
-        const lastUpdatedTime = "16/05/2026 12:40";
+        'use strict';
+
+        const lastUpdatedTime = "17/05/2026 23:32";
         const historyDays = ['28/04', '29/04', '01/05', '03/05', '04/05', '07/05', '13/05', '15/05', '16/05'];
         
         const brandColors = {
             "Amazon Sweden": "#9b8767", 
-            "CDON": "#065f46",          
             "Elgiganten": "#10b981",    
             "Inet": "#ef4444",          
             "Komplett": "#d4af37",      
@@ -198,7 +200,6 @@
             },
             retailers: [
                 { retailer: "Amazon Sweden", price_sek: 9986, url: "https://www.amazon.se/-/en/AMD-100-100001978WOF/dp/B0GTRTJSNZ/", history: [10420, 10390, 10388, 10390, 10390, 10390, 9986, 9986, 9986], shipping_cost_sek: 0, delivery_time: "1-2 days" },
-                { retailer: "CDON", price_sek: 15359, url: "https://cdon.se/produkt/processor-amd-ryzentm-9-9950x3d2-16-karnor-32-tradar-boostfrekvens-upp-till-560-ghz-8740e716c6dc5ff4/", history: [15500, 14804, 14804, 14500, 14200, 14721, 14758, 15193, 15359], shipping_cost_sek: 49, delivery_time: "2-5 days" },
                 { retailer: "Elgiganten", price_sek: 9987, url: "https://www.elgiganten.se/product/gaming/datorkomponenter/processor-cpu/amd-ryzen-9-9950x3d2-processor/1083223", history: [10390, 10390, 10390, 10390, 10390, 10390, 9990, 9987, 9987], shipping_cost_sek: 49, delivery_time: "1-3 days" },
                 { retailer: "Inet", price_sek: 10399, url: "https://www.inet.se/produkt/5307669/amd-ryzen-9-9950x3d2-4-3ghz-208mb", history: [10449, 10399, 10399, 10399, 10399, 10399, 10399, 10399, 10399], shipping_cost_sek: 0, delivery_time: "1-2 days" },
                 { retailer: "Komplett", price_sek: 9986, url: "https://www.komplett.se/product/1338752/datorutrustning/datorkomponenter/processor/amd-ryzen-9-9950x3d2-dual-edition-cpu", history: [99999, 10390, 10390, 10390, 10390, 10390, 9989, 9986, 9986], shipping_cost_sek: 0, delivery_time: "1-3 days" },
@@ -208,6 +209,7 @@
             ]
         };
 
+        // Sort retailers alphabetically
         appData.retailers.sort((a, b) => a.retailer.localeCompare(b.retailer));
 
         const techDefinitions = {
@@ -245,16 +247,11 @@
             "AMD Shadow Stack": "A hardware protection mechanism that maintains a secondary, hidden stack to verify return addresses, effectively mitigating Return-Oriented Programming (ROP) malware attacks."
         };
 
-        const formatPrice = (sek) => {
-            return `${sek.toLocaleString('sv-SE')} SEK`;
-        };
+        const formatPrice = (sek) => `${sek.toLocaleString('sv-SE')} SEK`;
 
-        // Calculates the absolute lowest price across all retailers' entire recorded history
-        const getLowestHistoryPrice = () => {
-            return Math.min(...appData.retailers.flatMap(r => r.history));
-        };
+        const getLowestHistoryPrice = () => Math.min(...appData.retailers.flatMap(r => r.history));
 
-        function generateTooltipHTML(description) {
+        const generateTooltipHTML = (description) => {
             if (!description) return '';
             return `
                 <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-[280px] p-4 bg-zinc-800 text-zinc-200 text-sm font-normal normal-case tracking-normal rounded-xl shadow-2xl border border-zinc-700 invisible opacity-0 group-hover/tooltip:visible group-hover/tooltip:opacity-100 transition-all z-50 pointer-events-none">
@@ -263,18 +260,11 @@
                     <div class="absolute top-full left-1/2 -translate-x-1/2 border-[7px] border-transparent border-t-zinc-800 -mt-[1px]"></div>
                 </div>
             `;
-        }
+        };
 
-        function createSpecItem(label, value, icon, span = 1, defKey = null) {
+        const createSpecItem = (label, value, icon, span = 1, defKey = null) => {
             const description = defKey ? techDefinitions[defKey] : null;
-            
-            // Map column spans strictly so the Tailwind JIT compiler detects the literal classes
-            const colSpans = {
-                1: '',
-                2: 'md:col-span-2',
-                3: 'md:col-span-3',
-                4: 'md:col-span-4'
-            };
+            const colSpans = { 1: '', 2: 'md:col-span-2', 3: 'md:col-span-3', 4: 'md:col-span-4' };
             const spanClass = colSpans[span] || '';
             
             return `
@@ -290,9 +280,9 @@
                     ${generateTooltipHTML(description)}
                 </div>
             `;
-        }
+        };
 
-        function createFeatureTag(label, defKey) {
+        const createFeatureTag = (label, defKey) => {
             const description = techDefinitions[defKey];
             return `
                 <div class="relative group/tooltip">
@@ -306,9 +296,9 @@
                     ${generateTooltipHTML(description)}
                 </div>
             `;
-        }
+        };
 
-        function createAccordionSection(title, icon, contentHtml, position, isOpen = false) {
+        const createAccordionSection = (title, icon, contentHtml, position, isOpen = false) => {
             let detailsClasses = "group bg-zinc-900 shadow-xl [&_summary::-webkit-details-marker]:hidden relative z-0 focus-within:z-10";
             let summaryClasses = "flex items-center justify-between p-6 cursor-pointer text-lg font-bold text-zinc-300 hover:bg-zinc-800/50 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-inset";
             
@@ -341,9 +331,9 @@
                     </div>
                 </details>
             `;
-        }
+        };
 
-        function renderSpecs() {
+        const renderSpecs = () => {
             const p = appData.processor;
             const container = document.getElementById('specs-container');
             
@@ -410,9 +400,9 @@
                 createAccordionSection("Connectivity & Memory Storage", "network", connHtml, "middle", false) +
                 createAccordionSection("Graphics Capabilities", "monitor", graphHtml, "middle", false) +
                 createAccordionSection("Security & Virtualization Features", "shield-check", secHtml, "bottom", false);
-        }
+        };
 
-        function renderDynamicData() {
+        const renderDynamicData = () => {
             document.getElementById('last-updated-text').textContent = lastUpdatedTime;
             document.getElementById('hero-lowest-price').textContent = formatPrice(getLowestHistoryPrice());
             
@@ -457,7 +447,7 @@
                     </td>
                 </tr>
             `}).join('');
-        }
+        };
 
         const lastPointLabelPlugin = {
             id: 'lastPointLabelPlugin',
@@ -535,7 +525,7 @@
             }
         };
 
-        function getChartData() {
+        const getChartData = () => {
             const datasets = appData.retailers.map((r) => {
                 const brandColor = brandColors[r.retailer] || '#ffffff';
                 return {
@@ -556,9 +546,9 @@
                 };
             });
             return { labels: historyDays, datasets: datasets };
-        }
+        };
 
-        function initChart() {
+        const initChart = () => {
             const ctx = document.getElementById('priceChart').getContext('2d');
             
             new Chart(ctx, {
@@ -568,13 +558,8 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    interaction: {
-                        mode: 'index',
-                        intersect: false,
-                    },
-                    layout: {
-                        padding: { top: 30, bottom: 30, right: 160, left: 15 } 
-                    },
+                    interaction: { mode: 'index', intersect: false },
+                    layout: { padding: { top: 30, bottom: 30, right: 160, left: 15 } },
                     plugins: {
                         legend: { display: false },
                         tooltip: {
@@ -603,7 +588,7 @@
                     }
                 }
             });
-        }
+        };
 
         // Boot
         document.addEventListener('DOMContentLoaded', () => {
